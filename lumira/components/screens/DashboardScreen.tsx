@@ -131,7 +131,7 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
             onPress={() => dispatch({ type: 'SET_TAB', tab: 'events' })}
           >
             <View style={[styles.tileIcon, { backgroundColor: '#FFEFEA' }]}>
-              <Text style={{ fontSize: 16 }}>⚠</Text>
+              <Text style={{ fontSize: 16, color: COLORS.red }}>{'!'}</Text>
             </View>
             <Text style={styles.tileBig}>{formatINR(outstanding)}</Text>
             <Text style={styles.tileSub}>Outstanding · {dueEvs.length} dues</Text>
@@ -141,7 +141,7 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
             onPress={() => dispatch({ type: 'SET_TAB', tab: 'calendar' })}
           >
             <View style={[styles.tileIcon, { backgroundColor: '#E7FBF5' }]}>
-              <Text style={{ fontSize: 16 }}>📅</Text>
+              <Text style={{ fontSize: 16, color: COLORS.green }}>{'▦'}</Text>
             </View>
             <Text style={styles.tileBig}>{monthEvs.length} events</Text>
             <Text style={styles.tileSub}>{doneCount} done · {upCount} upcoming</Text>

@@ -159,7 +159,7 @@ export default function CalendarScreen({ openSheet }: Props) {
                   </View>
                   <Text style={styles.selEventTitle}>{ev.title}</Text>
                   <View style={styles.venueRow}>
-                    <Text style={styles.venueDot}>📍</Text>
+                    <Text style={styles.venueDot}>{'◉'}</Text>
                     <Text style={styles.venueText}>{ev.venue}</Text>
                   </View>
                 </View>

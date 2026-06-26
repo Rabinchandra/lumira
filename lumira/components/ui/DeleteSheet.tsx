@@ -22,7 +22,7 @@ export default function DeleteSheet({ onClose, showToast }: Props) {
       <View style={styles.backdrop}>
         <Pressable style={styles.card}>
           <View style={styles.iconCircle}>
-            <Text style={styles.icon}>🗑</Text>
+            <Text style={styles.icon}>{'×'}</Text>
           </View>
           <Text style={styles.title}>Delete event?</Text>
           <Text style={styles.body}>
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     width: 54, height: 54, borderRadius: 27,
     backgroundColor: '#FFEDEA', alignItems: 'center', justifyContent: 'center', marginBottom: 14,
   },
-  icon: { fontSize: 24 },
+  icon: { fontSize: 30, color: COLORS.red, lineHeight: 32 },
   title: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 18, color: COLORS.textPrimary, marginBottom: 6 },
   body: { fontFamily: 'DMSans_400Regular', fontSize: 14, color: COLORS.textMuted, textAlign: 'center', lineHeight: 22, marginBottom: 20 },
   btns: { flexDirection: 'row', gap: 11, width: '100%' },

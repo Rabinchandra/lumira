@@ -69,15 +69,13 @@ export default function CreateStudioScreen() {
 
         {/* Create button */}
         <TouchableOpacity
-          style={styles.createBtnWrapper}
+          style={[styles.createBtnWrapper, styles.createBtn]}
           onPress={() => {
             dispatch({ type: 'SET_SCREEN', screen: 'app' });
           }}
           activeOpacity={0.85}
         >
-          <LinearGradient colors={ACCENT.grad} style={styles.createBtn}>
-            <Text style={styles.createBtnText}>Create studio</Text>
-          </LinearGradient>
+          <Text style={styles.createBtnText}>Create studio</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -125,6 +123,6 @@ const styles = StyleSheet.create({
   previewName: { fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 16, color: COLORS.textPrimary },
   previewRole: { fontFamily: 'DMSans_400Regular', fontSize: 13, color: COLORS.textMuted },
   createBtnWrapper: { borderRadius: 18, overflow: 'hidden', shadowColor: '#7C5CFC', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.35, shadowRadius: 20, elevation: 8 },
-  createBtn: { height: 56, alignItems: 'center', justifyContent: 'center' },
+  createBtn: { height: 56, alignItems: 'center', justifyContent: 'center', backgroundColor: ACCENT.solid },
   createBtnText: { fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 16, color: '#fff' },
 });

@@ -57,7 +57,7 @@ export default function EventDetailScreen({ openSheet }: Props) {
               style={styles.heroBtn}
               onPress={() => openSheet('delete')}
             >
-              <Text style={styles.heroBtnText}>🗑</Text>
+              <Text style={styles.heroBtnText}>{'×'}</Text>
             </TouchableOpacity>
           </View>
           {/* Title at bottom */}
@@ -73,15 +73,15 @@ export default function EventDetailScreen({ openSheet }: Props) {
           {/* Meta info */}
           <View style={styles.metaCard}>
             <View style={styles.metaRow}>
-              <Text style={styles.metaIcon}>📅</Text>
+              <Text style={styles.metaIcon}>{'▦'}</Text>
               <Text style={styles.metaText}>{formatLong(ev.dateISO)}</Text>
             </View>
             <View style={[styles.metaRow, styles.metaBorder]}>
-              <Text style={styles.metaIcon}>🕐</Text>
+              <Text style={styles.metaIcon}>{'◷'}</Text>
               <Text style={styles.metaText}>{ev.timeLabel}</Text>
             </View>
             <View style={[styles.metaRow, styles.metaLast]}>
-              <Text style={styles.metaIcon}>📍</Text>
+              <Text style={styles.metaIcon}>{'◉'}</Text>
               <Text style={styles.metaText}>{ev.venue}</Text>
             </View>
           </View>
@@ -100,10 +100,9 @@ export default function EventDetailScreen({ openSheet }: Props) {
             <TouchableOpacity
               onPress={() => openSheet('call', { name: ev.clientName, phone: ev.clientPhone })}
               activeOpacity={0.85}
+              style={styles.callBtn}
             >
-              <LinearGradient colors={ACCENT.grad} style={styles.callBtn}>
-                <Text style={styles.callIcon}>📞</Text>
-              </LinearGradient>
+              <Text style={styles.callIcon}>{'☎︎'}</Text>
             </TouchableOpacity>
           </View>
 
@@ -230,9 +229,10 @@ const styles = StyleSheet.create({
   clientPhone: { fontFamily: 'DMSans_400Regular', fontSize: 13, color: COLORS.textMuted },
   callBtn: {
     width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: ACCENT.solid,
     shadowColor: '#7C5CFC', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
   },
-  callIcon: { fontSize: 20 },
+  callIcon: { fontSize: 20, color: '#fff' },
 
   card: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#F0EEF7', borderRadius: 22, padding: 18 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },

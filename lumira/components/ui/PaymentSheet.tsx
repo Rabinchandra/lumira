@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Pressable } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
@@ -63,10 +62,8 @@ export default function PaymentSheet({ onClose, showToast }: Props) {
             })}
           </View>
 
-          <TouchableOpacity onPress={handleSubmit} activeOpacity={0.85}>
-            <LinearGradient colors={ACCENT.grad} style={styles.saveBtn}>
-              <Text style={styles.saveBtnText}>Save payment</Text>
-            </LinearGradient>
+          <TouchableOpacity onPress={handleSubmit} activeOpacity={0.85} style={styles.saveBtn}>
+            <Text style={styles.saveBtnText}>Save payment</Text>
           </TouchableOpacity>
         </Pressable>
       </Pressable>
@@ -94,6 +91,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   methodText: { fontFamily: 'DMSans_600SemiBold', fontSize: 13, color: COLORS.textSecondary },
-  saveBtn: { height: 54, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  saveBtn: { height: 54, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: ACCENT.solid },
   saveBtnText: { fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 16, color: '#fff' },
 });

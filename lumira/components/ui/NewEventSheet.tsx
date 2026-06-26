@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Pressable, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
@@ -90,10 +89,8 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
               </View>
             </View>
 
-            <TouchableOpacity onPress={handleSubmit} activeOpacity={0.85} style={{ marginTop: 20 }}>
-              <LinearGradient colors={ACCENT.grad} style={styles.createBtn}>
-                <Text style={styles.createBtnText}>Create event</Text>
-              </LinearGradient>
+            <TouchableOpacity onPress={handleSubmit} activeOpacity={0.85} style={[styles.createBtn, { marginTop: 20 }]}>
+              <Text style={styles.createBtnText}>Create event</Text>
             </TouchableOpacity>
           </ScrollView>
         </Pressable>
@@ -125,6 +122,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F5FB', paddingHorizontal: 16, justifyContent: 'center', marginBottom: 16,
   },
   dateText: { fontFamily: 'DMSans_500Medium', fontSize: 14, color: COLORS.textPrimary },
-  createBtn: { height: 54, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  createBtn: { height: 54, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: ACCENT.solid },
   createBtnText: { fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 16, color: '#fff' },
 });

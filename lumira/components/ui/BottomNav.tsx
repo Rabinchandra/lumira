@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT } from '../../constants/colors';
@@ -32,10 +31,8 @@ export default function BottomNav({ openNewSheet }: Props) {
 
       {/* FAB */}
       <View style={styles.fabWrapper}>
-        <TouchableOpacity onPress={openNewSheet} activeOpacity={0.85}>
-          <LinearGradient colors={ACCENT.grad} style={styles.fab}>
-            <Text style={styles.fabPlus}>+</Text>
-          </LinearGradient>
+        <TouchableOpacity onPress={openNewSheet} activeOpacity={0.85} style={styles.fab}>
+          <Text style={styles.fabPlus}>+</Text>
         </TouchableOpacity>
       </View>
 
@@ -62,13 +59,13 @@ function HomeIcon({ color }: { color: string }) {
   );
 }
 function CalIcon({ color }: { color: string }) {
-  return <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 16, color }}>📅</Text></View>;
+  return <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18, color }}>{'▦'}</Text></View>;
 }
 function ListIcon({ color }: { color: string }) {
-  return <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 16, color }}>☰</Text></View>;
+  return <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18, color }}>{'☰'}</Text></View>;
 }
 function ProfileIcon({ color }: { color: string }) {
-  return <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 16, color }}>👤</Text></View>;
+  return <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18, color }}>{'◉'}</Text></View>;
 }
 
 const styles = StyleSheet.create({
@@ -100,6 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: ACCENT.solid,
     marginTop: -18,
     shadowColor: '#7C5CFC',
     shadowOffset: { width: 0, height: 12 },
