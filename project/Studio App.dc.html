@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;font-family:'DM Sans',system-ui,sans-serif;}
+  ::-webkit-scrollbar{width:0;height:0;}
+  .scr{animation:scrIn .34s cubic-bezier(.2,.7,.2,1) both;}
+  .sht{animation:sheetIn .34s cubic-bezier(.2,.8,.2,1) both;}
+  @keyframes scrIn{from{transform:translateY(12px);}to{transform:none;}}
+  @keyframes sheetIn{from{transform:translateY(20px);}to{transform:none;}}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 100% at 50% 0%,#EEEBF7 0%,#E7E4F0 55%,#E2E0EC 100%);position:relative;overflow:hidden;padding:28px 0;">
+  <div style="position:absolute;top:-120px;left:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,#C9A6FF 0%,transparent 70%);opacity:.55;filter:blur(20px);"></div>
+  <div style="position:absolute;bottom:-140px;right:-90px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,#FFB3C7 0%,transparent 70%);opacity:.5;filter:blur(20px);"></div>
+
+  <div style="position:relative;width:{{ scaleW }}px;height:{{ scaleH }}px;flex:none;">
+  <div style="position:absolute;top:0;left:0;width:412px;height:880px;border-radius:46px;background:#0E0B1A;padding:7px;box-shadow:0 40px 90px rgba(30,16,70,.4),0 0 0 1px rgba(255,255,255,.06);transform:scale({{ scale }});transform-origin:top left;">
+    <div style="position:relative;width:100%;height:100%;border-radius:39px;overflow:hidden;background:#F6F5FB;display:flex;flex-direction:column;">
+
+      <!-- status bar -->
+      <div style="height:38px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 24px;position:relative;z-index:5;">
+        <span style="font-family:'Space Grotesk';font-weight:600;font-size:14px;color:{{ statusColor }};">9:30</span>
+        <div style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:90px;height:26px;background:#0E0B1A;border-radius:14px;"></div>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><path d="M1 8h2v3H1zM5 5h2v6H5zM9 2.5h2V11H9zM13 0h2v11h-2z" fill="{{ statusColor }}"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10 2.4 11.8 3.2 13.1 4.5l1.1-1.1C12.6 1.8 10.4 1 8 1S3.4 1.8 1.8 3.4l1.1 1.1C4.2 3.2 6 2.4 8 2.4z" fill="{{ statusColor }}"/><path d="M8 5.6c1.1 0 2.1.4 2.8 1.2l1.1-1.1C10.8 4.6 9.5 4 8 4s-2.8.6-3.9 1.7l1.1 1.1C6 6 7 5.6 8 5.6z" fill="{{ statusColor }}"/><circle cx="8" cy="9.3" r="1.6" fill="{{ statusColor }}"/></svg>
+          <svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1.5" width="20" height="9" rx="2.5" stroke="{{ statusColor }}" stroke-opacity=".4"/><rect x="2.6" y="3" width="14" height="6" rx="1.3" fill="{{ statusColor }}"/><rect x="22" y="4" width="1.6" height="4" rx=".8" fill="{{ statusColor }}" fill-opacity=".5"/></svg>
+        </div>
+      </div>
+
+      <div style="flex:1;position:relative;overflow:hidden;">
+
+        <!-- ============ SIGN IN ============ -->
+        <sc-if value="{{ vSignin }}" hint-placeholder-val="{{ true }}">
+        <div class="scr" style="position:absolute;inset:0;background:linear-gradient(165deg,#1B0F3B 0%,#2B1466 45%,#4B1E8C 100%);display:flex;flex-direction:column;padding:0 30px;color:#fff;overflow:hidden;">
+          <div style="position:absolute;top:-60px;right:-40px;width:220px;height:220px;border-radius:50%;background:{{ accentGrad }};opacity:.45;filter:blur(10px);"></div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2;">
+            <div style="width:74px;height:74px;border-radius:22px;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;box-shadow:0 14px 34px rgba(124,92,252,.5);margin-bottom:30px;">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="15" stroke="#fff" stroke-width="2.4"/><path d="M20 5 L20 20 L33 27" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M20 35 L20 20 L7 13" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M35 14 L20 20 L24 35" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="20" r="4" fill="#fff"/></svg>
+            </div>
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:40px;letter-spacing:-1.5px;line-height:1;">Lumira</div>
+            <div style="font-size:17px;color:rgba(255,255,255,.66);margin-top:14px;line-height:1.45;max-width:280px;">Run your photography studio — events, team & payments in one calm place.</div>
+          </div>
+          <div style="position:relative;z-index:2;padding-bottom:44px;">
+            <div onClick="{{ signIn }}" style="height:58px;background:#fff;border-radius:18px;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.25);">
+              <svg width="22" height="22" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35.5 24 35.5c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.5 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 11.5 24 11.5c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.5 4.5 24 4.5 16.3 4.5 9.7 8.9 6.3 14.7z"/><path fill="#4CAF50" d="M24 43.5c5.2 0 9.9-2 13.5-5.2l-6.2-5.3c-2.1 1.6-4.8 2.5-7.3 2.5-5.2 0-9.6-3.1-11.3-7.5l-6.5 5C9.6 39 16.2 43.5 24 43.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.5l6.2 5.3C40.9 36.4 43.5 30.7 43.5 24c0-1.2-.1-2.4-.4-3.5z"/></svg>
+              <span style="font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#1A1430;">Continue with Google</span>
+            </div>
+            <div style="text-align:center;font-size:12px;color:rgba(255,255,255,.45);margin-top:18px;line-height:1.5;">By continuing you agree to our Terms<br>and Privacy Policy.</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ ONBOARD CHOICE ============ -->
+        <sc-if value="{{ vOnboard }}" hint-placeholder-val="{{ true }}">
+        <div class="scr" style="position:absolute;inset:0;background:#16103A;display:flex;flex-direction:column;padding:24px 24px 36px;color:#fff;overflow:auto;">
+          <div style="display:flex;align-items:center;gap:14px;margin:8px 0 34px;">
+            <div style="width:46px;height:46px;border-radius:14px;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:18px;">AM</div>
+            <div>
+              <div style="font-size:13px;color:rgba(255,255,255,.55);">Signed in as</div>
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:17px;">Aanya Mehra</div>
+            </div>
+          </div>
+          <div style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-1px;line-height:1.12;margin-bottom:8px;">Let's get your<br>studio set up</div>
+          <div style="font-size:15px;color:rgba(255,255,255,.6);margin-bottom:30px;">Create a new studio or join your team with an invite code.</div>
+          <div onClick="{{ gotoCreate }}" style="background:{{ accentGrad }};border-radius:22px;padding:22px;cursor:pointer;margin-bottom:16px;box-shadow:0 16px 40px rgba(124,92,252,.4);">
+            <div style="width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>
+            </div>
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;">Create a studio</div>
+            <div style="font-size:14px;color:rgba(255,255,255,.78);margin-top:4px;">Start fresh and invite your team</div>
+          </div>
+          <div onClick="{{ gotoJoin }}" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:22px;cursor:pointer;">
+            <div style="width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 3h6v6M21 3l-9 9M10 5H5a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;">Join with code</div>
+            <div style="font-size:14px;color:rgba(255,255,255,.6);margin-top:4px;">Enter a 6-character invite code</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ CREATE TEAM ============ -->
+        <sc-if value="{{ vCreate }}" hint-placeholder-val="{{ true }}">
+        <div class="scr" style="position:absolute;inset:0;background:#F6F5FB;display:flex;flex-direction:column;overflow:auto;">
+          <div style="padding:14px 20px 4px;display:flex;align-items:center;gap:14px;">
+            <div onClick="{{ gotoOnboard }}" style="width:40px;height:40px;border-radius:12px;background:#fff;border:1px solid #ECEAF4;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#1A1430" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div style="padding:18px 24px 0;">
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:28px;letter-spacing:-1px;color:#1A1430;">Create your studio</div>
+            <div style="font-size:15px;color:#6B6486;margin-top:6px;">You'll be the owner and can invite your team next.</div>
+          </div>
+          <div style="padding:26px 24px;display:flex;flex-direction:column;gap:18px;">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#6B6486;margin-bottom:8px;">Studio name</div>
+              <input value="{{ studioName }}" onInput="{{ onStudioName }}" placeholder="e.g. Lumière Co." style="width:100%;height:54px;border-radius:16px;border:1.5px solid #E6E3F0;background:#fff;padding:0 18px;font-family:'DM Sans';font-size:16px;color:#1A1430;outline:none;"/>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#6B6486;margin-bottom:8px;">Your role</div>
+              <div style="display:flex;flex-wrap:wrap;gap:9px;">
+                <sc-for list="{{ roleChips }}" as="r" hint-placeholder-count="4">
+                  <div onClick="{{ r.pick }}" style="padding:11px 16px;border-radius:13px;font-size:14px;font-weight:600;cursor:pointer;background:{{ r.bg }};color:{{ r.fg }};border:1.5px solid {{ r.bd }};">{{ r.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #ECEAF4;border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;margin-top:4px;">
+              <div style="width:48px;height:48px;border-radius:14px;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#fff;">{{ studioInitials }}</div>
+              <div>
+                <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#1A1430;">{{ studioPreview }}</div>
+                <div style="font-size:13px;color:#9C95B4;">Owner · Aanya Mehra</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:auto;padding:18px 24px 30px;">
+            <div onClick="{{ doCreate }}" style="height:56px;border-radius:18px;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#fff;cursor:pointer;box-shadow:0 12px 30px rgba(124,92,252,.35);">Create studio</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ JOIN TEAM ============ -->
+        <sc-if value="{{ vJoin }}" hint-placeholder-val="{{ true }}">
+        <div class="scr" style="position:absolute;inset:0;background:#F6F5FB;display:flex;flex-direction:column;overflow:auto;">
+          <div style="padding:14px 20px 4px;display:flex;align-items:center;gap:14px;">
+            <div onClick="{{ gotoOnboard }}" style="width:40px;height:40px;border-radius:12px;background:#fff;border:1px solid #ECEAF4;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#1A1430" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div style="padding:18px 24px 0;">
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:28px;letter-spacing:-1px;color:#1A1430;">Join a studio</div>
+            <div style="font-size:15px;color:#6B6486;margin-top:6px;">Ask the studio owner for the 6-character invite code.</div>
+          </div>
+          <div style="padding:34px 24px;">
+            <div style="display:flex;gap:9px;justify-content:space-between;">
+              <sc-for list="{{ codeBoxes }}" as="b" hint-placeholder-count="6">
+                <div style="flex:1;aspect-ratio:1;border-radius:15px;background:#fff;border:1.5px solid {{ b.bd }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:24px;color:#1A1430;">{{ b.ch }}</div>
+              </sc-for>
+            </div>
+            <input value="{{ joinCode }}" onInput="{{ onJoinCode }}" placeholder="Type code" maxlength="6" style="width:100%;height:52px;border-radius:15px;border:1.5px solid #E6E3F0;background:#fff;padding:0 18px;margin-top:18px;font-family:'Space Grotesk';font-size:18px;letter-spacing:4px;text-transform:uppercase;color:#1A1430;outline:none;"/>
+            <div style="font-size:13px;color:#9C95B4;margin-top:14px;text-align:center;">Try <b style="color:#6B6486;">LUM4X9</b> to preview a joined studio</div>
+          </div>
+          <div style="margin-top:auto;padding:18px 24px 30px;">
+            <div onClick="{{ doJoin }}" style="height:56px;border-radius:18px;background:{{ joinBtnBg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:16px;color:{{ joinBtnFg }};cursor:pointer;">Join studio</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ APP: DASHBOARD ============ -->
+        <sc-if value="{{ tabDashboard }}" hint-placeholder-val="{{ true }}">
+        <div class="scr" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#F6F5FB;">
+          <div style="flex:1;overflow:auto;padding:6px 18px 96px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 18px;">
+              <div onClick="{{ openTeamSheet }}" style="display:flex;align-items:center;gap:11px;cursor:pointer;">
+                <div style="width:42px;height:42px;border-radius:13px;background:{{ team.color }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:16px;color:#fff;">{{ team.initials }}</div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:5px;font-family:'Space Grotesk';font-weight:700;font-size:17px;color:#1A1430;">{{ team.name }}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="margin-top:1px;"><path d="M6 9l6 6 6-6" stroke="#9C95B4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <div style="font-size:12.5px;color:#9C95B4;">{{ team.role }} · {{ team.memberLabel }}</div>
+                </div>
+              </div>
+              <div onClick="{{ goProfile }}" style="width:42px;height:42px;border-radius:50%;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#fff;cursor:pointer;">AM</div>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div style="font-size:14px;color:#6B6486;">{{ greeting }}</div>
+              <div style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #ECEAF4;border-radius:11px;padding:5px 8px;">
+                <div onClick="{{ prevMonth }}" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#6B6486" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div style="font-family:'Space Grotesk';font-weight:600;font-size:13.5px;color:#1A1430;min-width:92px;text-align:center;">{{ monthLabel }}</div>
+                <div onClick="{{ nextMonth }}" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#6B6486" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+
+            <!-- hero -->
+            <div style="border-radius:24px;background:{{ accentGrad }};padding:22px;color:#fff;box-shadow:0 18px 40px rgba(124,92,252,.32);position:relative;overflow:hidden;">
+              <div style="position:absolute;top:-30px;right:-20px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.14);"></div>
+              <div style="position:relative;">
+                <div style="font-size:13.5px;color:rgba(255,255,255,.8);">Collected this month</div>
+                <div style="display:flex;align-items:flex-end;gap:10px;margin-top:6px;">
+                  <div style="font-family:'Space Grotesk';font-weight:700;font-size:38px;letter-spacing:-1.5px;line-height:1;">{{ collected }}</div>
+                  <div style="display:flex;align-items:center;gap:3px;background:rgba(255,255,255,.2);border-radius:8px;padding:3px 7px;margin-bottom:4px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M7 14l5-5 5 5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="font-size:12px;font-weight:700;">{{ trendPct }}</span>
+                  </div>
+                </div>
+                <div style="font-size:13px;color:rgba(255,255,255,.72);margin-top:8px;">{{ bookedLabel }}</div>
+                <div style="height:7px;border-radius:4px;background:rgba(255,255,255,.22);margin-top:11px;overflow:hidden;">
+                  <div style="height:100%;border-radius:4px;background:#fff;width:{{ collectedPct }};"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- two tiles -->
+            <div style="display:flex;gap:12px;margin-top:14px;">
+              <div onClick="{{ goEvents }}" style="flex:1;background:#fff;border:1px solid #F0EEF7;border-radius:20px;padding:16px;cursor:pointer;">
+                <div style="width:34px;height:34px;border-radius:11px;background:#FFEFEA;display:flex;align-items:center;justify-content:center;margin-bottom:12px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16h.01" stroke="#FF6B5E" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#FF6B5E" stroke-width="2"/></svg></div>
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:21px;color:#1A1430;letter-spacing:-.5px;">{{ outstanding }}</div>
+                <div style="font-size:12.5px;color:#9C95B4;margin-top:2px;">Outstanding · {{ duesCount }}</div>
+              </div>
+              <div onClick="{{ goCalendar }}" style="flex:1;background:#fff;border:1px solid #F0EEF7;border-radius:20px;padding:16px;cursor:pointer;">
+                <div style="width:34px;height:34px;border-radius:11px;background:#E7FBF5;display:flex;align-items:center;justify-content:center;margin-bottom:12px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="3" stroke="#12C9A6" stroke-width="2"/><path d="M3 9h18M8 3v3M16 3v3" stroke="#12C9A6" stroke-width="2" stroke-linecap="round"/></svg></div>
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:21px;color:#1A1430;letter-spacing:-.5px;">{{ eventsTotal }} events</div>
+                <div style="font-size:12.5px;color:#9C95B4;margin-top:2px;">{{ eventsDone }} · {{ eventsUp }}</div>
+              </div>
+            </div>
+
+            <!-- category breakdown -->
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:22px;padding:18px;margin-top:14px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;">
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px;color:#1A1430;">By category</div>
+                <div style="font-size:13px;color:#9C95B4;">{{ bookedShort }} booked</div>
+              </div>
+              <div style="display:flex;height:12px;border-radius:7px;overflow:hidden;gap:2px;background:#F4F2FA;">
+                <sc-for list="{{ catSegs }}" as="s" hint-placeholder-count="4">
+                  <div style="width:{{ s.width }};background:{{ s.color }};"></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:11px;margin-top:16px;">
+                <sc-for list="{{ catLegend }}" as="c" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:10px;height:10px;border-radius:3px;background:{{ c.color }};"></div>
+                    <div style="flex:1;font-size:14px;color:#3A3358;font-weight:500;">{{ c.label }}</div>
+                    <div style="font-size:13px;color:#9C95B4;">{{ c.pct }}</div>
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:14px;color:#1A1430;min-width:54px;text-align:right;">{{ c.amount }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- upcoming -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:24px 2px 12px;">
+              <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#1A1430;">Upcoming</div>
+              <div onClick="{{ goCalendar }}" style="font-size:13.5px;font-weight:600;color:{{ accentInk }};cursor:pointer;">Calendar</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <sc-for list="{{ upcoming }}" as="ev" hint-placeholder-count="3">
+                <div onClick="{{ ev.open }}" style="background:#fff;border:1px solid #F0EEF7;border-radius:18px;padding:13px;display:flex;align-items:center;gap:13px;cursor:pointer;">
+                  <div style="width:50px;height:54px;border-radius:13px;background:{{ ev.grad }};display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;flex:none;">
+                    <div style="font-family:'Space Grotesk';font-weight:700;font-size:20px;line-height:1;">{{ ev.dd }}</div>
+                    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;opacity:.9;">{{ ev.mon }}</div>
+                  </div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:15px;color:#1A1430;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ ev.title }}</div>
+                    <div style="display:flex;align-items:center;gap:7px;margin-top:4px;">
+                      <span style="font-size:11.5px;font-weight:600;color:{{ ev.color }};background:{{ ev.soft }};padding:2px 7px;border-radius:6px;">{{ ev.typeLabel }}</span>
+                      <span style="font-size:12.5px;color:#9C95B4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ ev.timeShort }}</span>
+                    </div>
+                  </div>
+                  <div style="text-align:right;flex:none;">
+                    <div style="font-size:11px;color:#9C95B4;">{{ ev.dueLabel }}</div>
+                    <div style="font-family:'Space Grotesk';font-weight:700;font-size:14px;color:{{ ev.dueColor }};">{{ ev.dueAmt }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- dues -->
+            <div style="margin:24px 2px 12px;font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#1A1430;">Outstanding dues</div>
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:20px;overflow:hidden;">
+              <sc-for list="{{ dues }}" as="d" hint-placeholder-count="3">
+                <div onClick="{{ d.open }}" style="display:flex;align-items:center;gap:13px;padding:14px 16px;border-bottom:1px solid {{ d.border }};cursor:pointer;">
+                  <div style="width:38px;height:38px;border-radius:11px;background:{{ d.soft }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:14px;color:{{ d.color }};">{{ d.initials }}</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:14.5px;color:#1A1430;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ d.title }}</div>
+                    <div style="font-size:12.5px;color:#9C95B4;">{{ d.client }}</div>
+                  </div>
+                  <div style="font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#FF6B5E;">{{ d.amount }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ APP: CALENDAR ============ -->
+        <sc-if value="{{ tabCalendar }}" hint-placeholder-val="{{ true }}">
+        <div class="scr" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#F6F5FB;">
+          <div style="flex:1;overflow:auto;padding:14px 18px 96px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+              <div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;color:#1A1430;letter-spacing:-.5px;">{{ monthLabel }}</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div onClick="{{ goToday }}" style="font-size:13px;font-weight:600;color:{{ accentInk }};background:{{ accentSoft }};padding:7px 12px;border-radius:11px;cursor:pointer;">Today</div>
+                <div onClick="{{ prevMonth }}" style="width:36px;height:36px;border-radius:11px;background:#fff;border:1px solid #ECEAF4;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#6B6486" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div onClick="{{ nextMonth }}" style="width:36px;height:36px;border-radius:11px;background:#fff;border:1px solid #ECEAF4;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#6B6486" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:22px;padding:14px;">
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;">
+                <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7">
+                  <div style="text-align:center;font-size:11px;font-weight:600;color:#B3ABC8;">{{ w.l }}</div>
+                </sc-for>
+              </div>
+              <sc-for list="{{ weeks }}" as="wk" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);">
+                  <sc-for list="{{ wk.days }}" as="d" hint-placeholder-count="7">
+                    <div onClick="{{ d.pick }}" style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;">
+                      <div style="width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:14.5px;background:{{ d.bg }};color:{{ d.fg }};border:{{ d.ring }};">{{ d.label }}</div>
+                      <div style="display:flex;gap:2.5px;margin-top:3px;height:5px;">
+                        <sc-for list="{{ d.dots }}" as="dot" hint-placeholder-count="0">
+                          <div style="width:5px;height:5px;border-radius:50%;background:{{ dot.c }};"></div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:24px 2px 12px;">
+              <div style="font-family:'Space Grotesk';font-weight:700;font-size:17px;color:#1A1430;">{{ selectedDayLabel }}</div>
+              <div style="font-size:13px;color:#9C95B4;">{{ selectedCount }}</div>
+            </div>
+
+            <sc-if value="{{ hasSelectedEvents }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <sc-for list="{{ selectedEvents }}" as="ev" hint-placeholder-count="2">
+                <div onClick="{{ ev.open }}" style="background:#fff;border:1px solid #F0EEF7;border-radius:18px;padding:14px;display:flex;gap:13px;cursor:pointer;">
+                  <div style="width:4px;border-radius:3px;background:{{ ev.color }};flex:none;"></div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+                      <span style="font-size:11.5px;font-weight:600;color:{{ ev.color }};background:{{ ev.soft }};padding:2px 7px;border-radius:6px;">{{ ev.typeLabel }}</span>
+                      <span style="font-size:12.5px;color:#9C95B4;">{{ ev.timeLabel }}</span>
+                    </div>
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:15.5px;color:#1A1430;">{{ ev.title }}</div>
+                    <div style="display:flex;align-items:center;gap:5px;margin-top:5px;font-size:12.5px;color:#9C95B4;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z" stroke="#9C95B4" stroke-width="2"/><circle cx="12" cy="10" r="2.4" stroke="#9C95B4" stroke-width="2"/></svg>{{ ev.venue }}</div>
+                  </div>
+                  <div style="display:flex;align-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#C9C3DA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                </div>
+              </sc-for>
+            </div>
+            </sc-if>
+            <sc-if value="{{ noSelectedEvents }}" hint-placeholder-val="{{ true }}">
+            <div onClick="{{ openNewSheet }}" style="background:#fff;border:1.5px dashed #DAD5E8;border-radius:18px;padding:28px;text-align:center;cursor:pointer;">
+              <div style="font-size:14px;color:#9C95B4;">No events on this day</div>
+              <div style="font-size:13.5px;font-weight:600;color:{{ accentInk }};margin-top:6px;">+ Add an event</div>
+            </div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ APP: EVENTS LIST ============ -->
+        <sc-if value="{{ tabEvents }}" hint-placeholder-val="{{ true }}">
+        <div class="scr" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#F6F5FB;">
+          <div style="flex:1;overflow:auto;padding:14px 18px 96px;">
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;color:#1A1430;letter-spacing:-.5px;margin-bottom:14px;">Events</div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;">
+              <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+                <div onClick="{{ f.pick }}" style="padding:9px 15px;border-radius:12px;font-size:13.5px;font-weight:600;cursor:pointer;background:{{ f.bg }};color:{{ f.fg }};border:1px solid {{ f.bd }};">{{ f.label }}</div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <sc-for list="{{ eventsList }}" as="ev" hint-placeholder-count="5">
+                <div onClick="{{ ev.open }}" style="background:#fff;border:1px solid #F0EEF7;border-radius:18px;padding:13px;display:flex;align-items:center;gap:13px;cursor:pointer;">
+                  <div style="width:50px;height:54px;border-radius:13px;background:{{ ev.grad }};display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;flex:none;">
+                    <div style="font-family:'Space Grotesk';font-weight:700;font-size:20px;line-height:1;">{{ ev.dd }}</div>
+                    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;opacity:.9;">{{ ev.mon }}</div>
+                  </div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:15px;color:#1A1430;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ ev.title }}</div>
+                    <div style="display:flex;align-items:center;gap:7px;margin-top:4px;">
+                      <span style="font-size:11.5px;font-weight:600;color:{{ ev.color }};background:{{ ev.soft }};padding:2px 7px;border-radius:6px;">{{ ev.typeLabel }}</span>
+                      <span style="font-size:12.5px;color:#9C95B4;">{{ ev.clientName }}</span>
+                    </div>
+                  </div>
+                  <div style="text-align:right;flex:none;">
+                    <div style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:{{ ev.statusColor }};background:{{ ev.statusBg }};padding:3px 8px;border-radius:7px;">{{ ev.statusLabel }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ APP: PROFILE ============ -->
+        <sc-if value="{{ tabProfile }}" hint-placeholder-val="{{ true }}">
+        <div class="scr" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#F6F5FB;">
+          <div style="flex:1;overflow:auto;padding:14px 18px 96px;">
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;color:#1A1430;letter-spacing:-.5px;margin-bottom:16px;">Studio</div>
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:22px;padding:18px;display:flex;align-items:center;gap:14px;">
+              <div style="width:56px;height:56px;border-radius:18px;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:20px;color:#fff;">AM</div>
+              <div>
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#1A1430;">Aanya Mehra</div>
+                <div style="font-size:13.5px;color:#9C95B4;">aanya@lumiere.co</div>
+              </div>
+            </div>
+
+            <div style="margin:22px 2px 11px;font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#1A1430;">{{ team.name }}</div>
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:20px;overflow:hidden;">
+              <sc-for list="{{ members }}" as="m" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:13px;padding:13px 16px;border-bottom:1px solid {{ m.border }};">
+                  <div style="width:40px;height:40px;border-radius:50%;background:{{ m.color }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:14px;color:#fff;">{{ m.initials }}</div>
+                  <div style="flex:1;">
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:14.5px;color:#1A1430;">{{ m.name }}</div>
+                    <div style="font-size:12.5px;color:#9C95B4;">{{ m.role }}</div>
+                  </div>
+                  <sc-if value="{{ m.you }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;font-weight:600;color:{{ accentInk }};background:{{ accentSoft }};padding:3px 9px;border-radius:7px;">You</div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- invite code -->
+            <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}">
+            <div style="background:{{ accentGrad }};border-radius:20px;padding:18px;margin-top:14px;color:#fff;position:relative;overflow:hidden;">
+              <div style="position:absolute;bottom:-30px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);"></div>
+              <div style="position:relative;">
+                <div style="font-size:13px;color:rgba(255,255,255,.82);">Invite code · expires in {{ codeExpiry }}</div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                  <div style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:5px;">{{ inviteCode }}</div>
+                  <div onClick="{{ copyCode }}" style="width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="11" height="11" rx="2.5" stroke="#fff" stroke-width="2"/><path d="M5 15V5a2 2 0 012-2h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
+                </div>
+                <div onClick="{{ regenCode }}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;background:rgba(255,255,255,.16);padding:8px 13px;border-radius:11px;font-size:13px;font-weight:600;cursor:pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>{{ copyLabel }}</div>
+              </div>
+            </div>
+            </sc-if>
+
+            <div style="margin:22px 2px 11px;font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#1A1430;">Your studios</div>
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:20px;overflow:hidden;">
+              <sc-for list="{{ teamsList }}" as="t" hint-placeholder-count="2">
+                <div onClick="{{ t.pick }}" style="display:flex;align-items:center;gap:13px;padding:13px 16px;border-bottom:1px solid {{ t.border }};cursor:pointer;">
+                  <div style="width:40px;height:40px;border-radius:12px;background:{{ t.color }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:14px;color:#fff;">{{ t.initials }}</div>
+                  <div style="flex:1;">
+                    <div style="font-family:'Space Grotesk';font-weight:600;font-size:14.5px;color:#1A1430;">{{ t.name }}</div>
+                    <div style="font-size:12.5px;color:#9C95B4;">{{ t.role }}</div>
+                  </div>
+                  <sc-if value="{{ t.active }}" hint-placeholder-val="{{ false }}"><div style="width:22px;height:22px;border-radius:50%;background:{{ accentSolid }};display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+
+            <div onClick="{{ signOut }}" style="margin-top:18px;height:52px;border-radius:16px;background:#fff;border:1px solid #F0EEF7;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M16 17l5-5-5-5M21 12H9M12 21H6a2 2 0 01-2-2V5a2 2 0 012-2h6" stroke="#FF6B5E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-family:'Space Grotesk';font-weight:600;font-size:15px;color:#FF6B5E;">Sign out</span>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ EVENT DETAIL ============ -->
+        <sc-if value="{{ vDetail }}" hint-placeholder-val="{{ false }}">
+        <div class="scr" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#F6F5FB;overflow:auto;">
+          <div style="height:200px;flex:none;background:{{ detail.grad }};position:relative;padding:14px 18px;">
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.34));"></div>
+            <div style="position:relative;display:flex;align-items:center;justify-content:space-between;">
+              <div onClick="{{ back }}" style="width:40px;height:40px;border-radius:13px;background:rgba(255,255,255,.22);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div onClick="{{ openDeleteSheet }}" style="width:40px;height:40px;border-radius:13px;background:rgba(255,255,255,.22);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13M9 7V4h6v3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+            <div style="position:absolute;left:18px;right:18px;bottom:16px;color:#fff;">
+              <span style="font-size:11.5px;font-weight:700;background:rgba(255,255,255,.25);padding:3px 9px;border-radius:7px;">{{ detail.typeLabel }}</span>
+              <div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;letter-spacing:-.5px;margin-top:9px;line-height:1.15;">{{ detail.title }}</div>
+            </div>
+          </div>
+
+          <div style="padding:18px 18px 130px;">
+            <!-- meta -->
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:20px;padding:6px 16px;">
+              <div style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid #F2F0F8;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="3" stroke="#9C95B4" stroke-width="2"/><path d="M3 9h18M8 3v3M16 3v3" stroke="#9C95B4" stroke-width="2" stroke-linecap="round"/></svg>
+                <div style="font-size:14.5px;color:#1A1430;font-weight:500;">{{ detail.dateLabel }}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid #F2F0F8;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#9C95B4" stroke-width="2"/><path d="M12 7v5l3 2" stroke="#9C95B4" stroke-width="2" stroke-linecap="round"/></svg>
+                <div style="font-size:14.5px;color:#1A1430;font-weight:500;">{{ detail.timeLabel }}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:13px;padding:12px 0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z" stroke="#9C95B4" stroke-width="2"/><circle cx="12" cy="10" r="2.4" stroke="#9C95B4" stroke-width="2"/></svg>
+                <div style="font-size:14.5px;color:#1A1430;font-weight:500;">{{ detail.venue }}</div>
+              </div>
+            </div>
+
+            <!-- client -->
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:20px;padding:16px;margin-top:13px;display:flex;align-items:center;gap:13px;">
+              <div style="width:46px;height:46px;border-radius:14px;background:{{ detail.soft }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:16px;color:{{ detail.color }};">{{ detail.clientInitials }}</div>
+              <div style="flex:1;">
+                <div style="font-family:'Space Grotesk';font-weight:600;font-size:15.5px;color:#1A1430;">{{ detail.clientName }}</div>
+                <div style="font-size:13px;color:#9C95B4;">{{ detail.clientPhone }}</div>
+              </div>
+              <div onClick="{{ callClient }}" style="width:46px;height:46px;border-radius:14px;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 18px rgba(124,92,252,.3);"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 005.5 5.5l1.5-2 4 1.5v3a2 2 0 01-2 2A16 16 0 014.5 6 2 2 0 016.5 4z" fill="#fff"/></svg></div>
+            </div>
+
+            <!-- payments -->
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:22px;padding:18px;margin-top:13px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px;color:#1A1430;">Payments</div>
+                <span style="font-size:11.5px;font-weight:600;color:{{ detail.payColor }};background:{{ detail.payBg }};padding:3px 9px;border-radius:7px;">{{ detail.payStatus }}</span>
+              </div>
+              <div style="display:flex;gap:10px;margin-bottom:14px;">
+                <div style="flex:1;">
+                  <div style="font-size:12px;color:#9C95B4;">Collected</div>
+                  <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#12C9A6;letter-spacing:-.3px;">{{ detail.paid }}</div>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:12px;color:#9C95B4;">Pending</div>
+                  <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#FF6B5E;letter-spacing:-.3px;">{{ detail.pending }}</div>
+                </div>
+                <div style="flex:1;text-align:right;">
+                  <div style="font-size:12px;color:#9C95B4;">Total</div>
+                  <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#1A1430;letter-spacing:-.3px;">{{ detail.total }}</div>
+                </div>
+              </div>
+              <div style="height:8px;border-radius:5px;background:#F2F0F8;overflow:hidden;">
+                <div style="height:100%;border-radius:5px;background:linear-gradient(90deg,#21D0A6,#12C9A6);width:{{ detail.paidPct }};"></div>
+              </div>
+
+              <sc-if value="{{ detail.hasPayments }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;display:flex;flex-direction:column;gap:0;">
+                <sc-for list="{{ detail.payments }}" as="pay" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid #F2F0F8;">
+                    <div style="width:34px;height:34px;border-radius:10px;background:#E7FBF5;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="#12C9A6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div style="flex:1;">
+                      <div style="font-size:14px;font-weight:600;color:#1A1430;">{{ pay.note }}</div>
+                      <div style="font-size:12px;color:#9C95B4;">{{ pay.dateLabel }} · {{ pay.method }}</div>
+                    </div>
+                    <div style="font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#1A1430;">{{ pay.amount }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              </sc-if>
+
+              <div onClick="{{ openPaySheet }}" style="margin-top:14px;height:48px;border-radius:14px;background:{{ accentSoft }};display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="{{ accentInk }}" stroke-width="2.4" stroke-linecap="round"/></svg>
+                <span style="font-family:'Space Grotesk';font-weight:600;font-size:14.5px;color:{{ accentInk }};">Record payment</span>
+              </div>
+            </div>
+
+            <!-- team -->
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:22px;padding:18px;margin-top:13px;">
+              <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px;color:#1A1430;margin-bottom:14px;">Crew</div>
+              <div style="display:flex;flex-direction:column;gap:13px;">
+                <sc-for list="{{ detail.team }}" as="m" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:{{ m.color }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:14px;color:#fff;">{{ m.initials }}</div>
+                    <div style="flex:1;">
+                      <div style="font-family:'Space Grotesk';font-weight:600;font-size:14.5px;color:#1A1430;">{{ m.name }}</div>
+                      <div style="font-size:12.5px;color:#9C95B4;">{{ m.role }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- notes -->
+            <div style="background:#fff;border:1px solid #F0EEF7;border-radius:22px;padding:18px;margin-top:13px;">
+              <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px;color:#1A1430;margin-bottom:8px;">Notes</div>
+              <div style="font-size:14px;line-height:1.55;color:#5A5278;">{{ detail.notes }}</div>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ BOTTOM NAV ============ -->
+        <sc-if value="{{ showNav }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:0;right:0;bottom:0;height:78px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-top:1px solid #EEEBF6;display:flex;align-items:flex-start;padding:11px 12px 0;z-index:10;">
+          <div onClick="{{ goDashboard }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7M6 10v9a1 1 0 001 1h3v-6h4v6h3a1 1 0 001-1v-9" stroke="{{ nav.home }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-size:10.5px;font-weight:600;color:{{ nav.home }};">Home</span>
+          </div>
+          <div onClick="{{ goCalendar }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="3" stroke="{{ nav.cal }}" stroke-width="2"/><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" stroke="{{ nav.cal }}" stroke-width="2" stroke-linecap="round"/></svg>
+            <span style="font-size:10.5px;font-weight:600;color:{{ nav.cal }};">Calendar</span>
+          </div>
+          <div style="flex:1;display:flex;justify-content:center;">
+            <div onClick="{{ openNewSheet }}" style="width:54px;height:54px;border-radius:18px;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;margin-top:-12px;box-shadow:0 12px 26px rgba(124,92,252,.45);cursor:pointer;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></div>
+          </div>
+          <div onClick="{{ goEvents }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M8 6h12M8 12h12M8 18h12" stroke="{{ nav.evt }}" stroke-width="2" stroke-linecap="round"/><circle cx="4" cy="6" r="1.4" fill="{{ nav.evt }}"/><circle cx="4" cy="12" r="1.4" fill="{{ nav.evt }}"/><circle cx="4" cy="18" r="1.4" fill="{{ nav.evt }}"/></svg>
+            <span style="font-size:10.5px;font-weight:600;color:{{ nav.evt }};">Events</span>
+          </div>
+          <div onClick="{{ goProfile }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.6" stroke="{{ nav.prof }}" stroke-width="2"/><path d="M5 20c0-3.4 3.1-6 7-6s7 2.6 7 6" stroke="{{ nav.prof }}" stroke-width="2" stroke-linecap="round"/></svg>
+            <span style="font-size:10.5px;font-weight:600;color:{{ nav.prof }};">Studio</span>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ OVERLAYS ============ -->
+        <sc-if value="{{ sheetTeam }}" hint-placeholder-val="{{ false }}">
+        <div class="ovl" onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(20,12,45,.5);z-index:30;display:flex;align-items:flex-end;">
+          <div class="sht" onClick="{{ stop }}" style="width:100%;background:#fff;border-radius:26px 26px 0 0;padding:8px 20px 30px;">
+            <div style="width:38px;height:4px;border-radius:3px;background:#E2DEEE;margin:6px auto 16px;"></div>
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#1A1430;margin-bottom:14px;">Switch studio</div>
+            <sc-for list="{{ teamsList }}" as="t" hint-placeholder-count="2">
+              <div onClick="{{ t.pick }}" style="display:flex;align-items:center;gap:13px;padding:13px;border-radius:16px;background:{{ t.rowBg }};margin-bottom:8px;cursor:pointer;">
+                <div style="width:44px;height:44px;border-radius:13px;background:{{ t.color }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#fff;">{{ t.initials }}</div>
+                <div style="flex:1;">
+                  <div style="font-family:'Space Grotesk';font-weight:600;font-size:15px;color:#1A1430;">{{ t.name }}</div>
+                  <div style="font-size:12.5px;color:#9C95B4;">{{ t.role }} · {{ t.memberLabel }}</div>
+                </div>
+                <sc-if value="{{ t.active }}" hint-placeholder-val="{{ false }}"><div style="width:24px;height:24px;border-radius:50%;background:{{ accentSolid }};display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></sc-if>
+              </div>
+            </sc-for>
+            <div onClick="{{ closeSheet }}" style="display:flex;align-items:center;gap:11px;padding:13px;border-radius:16px;border:1.5px dashed #DAD5E8;margin-top:4px;cursor:pointer;">
+              <div style="width:44px;height:44px;border-radius:13px;background:{{ accentSoft }};display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="{{ accentInk }}" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:15px;color:{{ accentInk }};">Create or join a studio</div>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetPay }}" hint-placeholder-val="{{ false }}">
+        <div class="ovl" onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(20,12,45,.5);z-index:30;display:flex;align-items:flex-end;">
+          <div class="sht" onClick="{{ stop }}" style="width:100%;background:#fff;border-radius:26px 26px 0 0;padding:8px 20px 30px;">
+            <div style="width:38px;height:4px;border-radius:3px;background:#E2DEEE;margin:6px auto 16px;"></div>
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#1A1430;">Record payment</div>
+            <div style="font-size:13px;color:#9C95B4;margin-top:3px;margin-bottom:18px;">Pending balance {{ detail.pending }}</div>
+            <div style="display:flex;align-items:center;background:#F6F5FB;border:1.5px solid #E6E3F0;border-radius:16px;padding:0 16px;height:62px;">
+              <span style="font-family:'Space Grotesk';font-weight:700;font-size:26px;color:#9C95B4;">₹</span>
+              <input value="{{ payAmount }}" onInput="{{ onPayAmount }}" inputmode="numeric" placeholder="0" style="flex:1;border:none;background:none;outline:none;font-family:'Space Grotesk';font-weight:700;font-size:26px;color:#1A1430;padding-left:8px;"/>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <sc-for list="{{ payMethods }}" as="pm" hint-placeholder-count="4">
+                <div onClick="{{ pm.pick }}" style="flex:1;text-align:center;padding:10px 0;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;background:{{ pm.bg }};color:{{ pm.fg }};border:1.5px solid {{ pm.bd }};">{{ pm.label }}</div>
+              </sc-for>
+            </div>
+            <div onClick="{{ submitPayment }}" style="margin-top:18px;height:54px;border-radius:16px;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#fff;cursor:pointer;">Save payment</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetNew }}" hint-placeholder-val="{{ false }}">
+        <div class="ovl" onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(20,12,45,.5);z-index:30;display:flex;align-items:flex-end;">
+          <div class="sht" onClick="{{ stop }}" style="width:100%;background:#fff;border-radius:26px 26px 0 0;padding:8px 20px 30px;max-height:88%;overflow:auto;">
+            <div style="width:38px;height:4px;border-radius:3px;background:#E2DEEE;margin:6px auto 16px;"></div>
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#1A1430;margin-bottom:16px;">New event</div>
+            <div style="font-size:13px;font-weight:600;color:#6B6486;margin-bottom:8px;">Title</div>
+            <input value="{{ newTitle }}" onInput="{{ onNewTitle }}" placeholder="e.g. Sharma Wedding" style="width:100%;height:50px;border-radius:14px;border:1.5px solid #E6E3F0;background:#fff;padding:0 16px;font-family:'DM Sans';font-size:15px;color:#1A1430;outline:none;"/>
+            <div style="font-size:13px;font-weight:600;color:#6B6486;margin:16px 0 8px;">Type</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <sc-for list="{{ typeChips }}" as="t" hint-placeholder-count="5">
+                <div onClick="{{ t.pick }}" style="padding:9px 14px;border-radius:11px;font-size:13px;font-weight:600;cursor:pointer;background:{{ t.bg }};color:{{ t.fg }};border:1.5px solid {{ t.bd }};">{{ t.label }}</div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:16px;">
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:600;color:#6B6486;margin-bottom:8px;">Date</div>
+                <div style="height:50px;border-radius:14px;border:1.5px solid #E6E3F0;background:#F6F5FB;display:flex;align-items:center;padding:0 16px;font-size:14px;color:#1A1430;font-weight:500;">{{ newDateLabel }}</div>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:600;color:#6B6486;margin-bottom:8px;">Total (₹)</div>
+                <input value="{{ newTotal }}" onInput="{{ onNewTotal }}" inputmode="numeric" placeholder="0" style="width:100%;height:50px;border-radius:14px;border:1.5px solid #E6E3F0;background:#fff;padding:0 16px;font-family:'Space Grotesk';font-size:15px;color:#1A1430;outline:none;"/>
+              </div>
+            </div>
+            <div onClick="{{ submitEvent }}" style="margin-top:20px;height:54px;border-radius:16px;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:16px;color:#fff;cursor:pointer;">Create event</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetDelete }}" hint-placeholder-val="{{ false }}">
+        <div class="ovl" onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(20,12,45,.5);z-index:31;display:flex;align-items:center;justify-content:center;padding:30px;">
+          <div onClick="{{ stop }}" style="width:100%;background:#fff;border-radius:24px;padding:24px;text-align:center;">
+            <div style="width:54px;height:54px;border-radius:50%;background:#FFEDEA;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13M9 7V4h6v3" stroke="#FF6B5E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#1A1430;">Delete event?</div>
+            <div style="font-size:14px;color:#9C95B4;margin-top:6px;line-height:1.5;">This will permanently remove {{ detail.title }} and its payment history.</div>
+            <div style="display:flex;gap:11px;margin-top:20px;">
+              <div onClick="{{ closeSheet }}" style="flex:1;height:50px;border-radius:14px;background:#F4F2FA;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:15px;color:#1A1430;cursor:pointer;">Cancel</div>
+              <div onClick="{{ doDelete }}" style="flex:1;height:50px;border-radius:14px;background:#FF6B5E;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:15px;color:#fff;cursor:pointer;">Delete</div>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetCall }}" hint-placeholder-val="{{ false }}">
+        <div class="ovl" style="position:absolute;inset:0;background:linear-gradient(180deg,#1B0F3B,#2B1466);z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:80px 0 60px;color:#fff;">
+          <div style="text-align:center;">
+            <div style="font-size:14px;color:rgba(255,255,255,.55);margin-bottom:24px;">calling…</div>
+            <div style="width:110px;height:110px;border-radius:50%;background:{{ accentGrad }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:40px;margin:0 auto 22px;animation:pulse 1.8s ease-in-out infinite;">{{ callInitials }}</div>
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;">{{ callName }}</div>
+            <div style="font-size:15px;color:rgba(255,255,255,.6);margin-top:6px;">{{ callPhone }}</div>
+          </div>
+          <div onClick="{{ endCall }}" style="width:66px;height:66px;border-radius:50%;background:#FF4747;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 12px 30px rgba(255,71,71,.5);"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 005.5 5.5l1.5-2 4 1.5v3a2 2 0 01-2 2A16 16 0 014.5 6 2 2 0 016.5 4z" fill="#fff" transform="rotate(135 12 12)"/></svg></div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+        <div class="ovl" style="position:absolute;left:50%;transform:translateX(-50%);bottom:96px;z-index:50;background:#1A1430;color:#fff;padding:11px 18px;border-radius:13px;font-size:13.5px;font-weight:600;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.3);">{{ toastMsg }}</div>
+        </sc-if>
+
+      </div>
+
+      <div style="height:22px;flex:none;display:flex;align-items:center;justify-content:center;">
+        <div style="width:130px;height:5px;border-radius:3px;background:{{ pillColor }};opacity:.5;"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:480,&quot;height&quot;:960},&quot;accent&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Violet&quot;,&quot;Coral&quot;,&quot;Emerald&quot;,&quot;Blue&quot;],&quot;default&quot;:&quot;Violet&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'signin',      // signin | onboard | create | join | app
+    tab: 'dashboard',      // dashboard | calendar | events | profile
+    teamId: 'A',
+    monthOffset: 0,        // 0 = June 2026
+    selectedDate: '2026-06-27',
+    openId: null,
+    sheet: null,           // team | pay | new | delete | call
+    filter: 'all',
+    // inputs
+    studioName: '',
+    studioRole: 'Lead Photographer',
+    joinCode: '',
+    payAmount: '',
+    payMethod: 'UPI',
+    newTitle: '',
+    newType: 'Wedding',
+    newTotal: '',
+    callName: '', callPhone: '', callInitials: '',
+    copied: false,
+    inviteCode: 'LUM4X9',
+    toast: '',
+    scale: 1,
+    events: {
+      A: [
+        {id:'e1',type:'Wedding',title:'Aanya & Vikram Wedding',dateISO:'2026-06-08',timeLabel:'4:00 PM – 11:30 PM',venue:'Taj Lands End, Mumbai',clientName:'Vikram Sethi',clientPhone:'+91 98200 11234',assigned:[{id:'a1',role:'Lead Photographer'},{id:'a2',role:'Photographer'},{id:'a4',role:'Videographer'},{id:'a5',role:'Editor'}],total:185000,notes:'Bride prep coverage from 2 PM. Drone permitted for outdoor shots. Deliver teaser within 10 days.',payments:[{dateISO:'2026-04-10',amount:60000,method:'UPI',note:'Booking advance'},{dateISO:'2026-05-20',amount:40000,method:'Bank transfer',note:'2nd installment'}]},
+        {id:'e2',type:'PreWedding',title:'Sneha & Arjun Pre-Wedding',dateISO:'2026-06-12',timeLabel:'6:30 AM – 10:00 AM',venue:'Lodhi Garden, Delhi',clientName:'Sneha Rao',clientPhone:'+91 99100 44521',assigned:[{id:'a1',role:'Lead Photographer'},{id:'a3',role:'Photographer'}],total:45000,notes:'Golden-hour sunrise shoot. Two outfit changes planned.',payments:[{dateISO:'2026-05-01',amount:20000,method:'UPI',note:'Advance'},{dateISO:'2026-06-12',amount:25000,method:'Cash',note:'Balance on shoot day'}]},
+        {id:'e3',type:'Corporate',title:'TechNova Annual Conference',dateISO:'2026-06-15',timeLabel:'9:00 AM – 6:00 PM',venue:'JW Marriott, Bengaluru',clientName:'Priya Nair',clientPhone:'+91 80450 77810',assigned:[{id:'a2',role:'Lead Photographer'},{id:'a4',role:'Videographer'}],total:120000,notes:'Keynote + breakout session coverage. Same-day highlight reel required.',payments:[{dateISO:'2026-05-15',amount:60000,method:'Bank transfer',note:'50% advance'}]},
+        {id:'e7',type:'Portrait',title:'Bansal Newborn Shoot',dateISO:'2026-06-05',timeLabel:'11:00 AM – 1:00 PM',venue:'Client home, Gurugram',clientName:'Ritu Bansal',clientPhone:'+91 98991 22043',assigned:[{id:'a3',role:'Photographer'}],total:12000,notes:'Studio props provided. Keep room warm for the baby.',payments:[{dateISO:'2026-06-05',amount:12000,method:'Cash',note:'Paid in full'}]},
+        {id:'e5',type:'Event',title:'Mehta Engagement Party',dateISO:'2026-06-27',timeLabel:'7:00 PM – 11:00 PM',venue:'The Leela, Mumbai',clientName:'Anil Mehta',clientPhone:'+91 98201 55678',assigned:[{id:'a1',role:'Lead Photographer'},{id:'a2',role:'Photographer'}],total:75000,notes:'Ring exchange around 8:30 PM. Focus on candid family moments.',payments:[{dateISO:'2026-05-28',amount:30000,method:'UPI',note:'Advance'}]},
+        {id:'e4',type:'Portrait',title:'Kapoor Family Portraits',dateISO:'2026-06-29',timeLabel:'5:00 PM – 7:00 PM',venue:'Aperture Studio, Delhi',clientName:'Meera Kapoor',clientPhone:'+91 99580 33129',assigned:[{id:'a3',role:'Photographer'},{id:'a5',role:'Assistant'}],total:18000,notes:'Three-generation family portrait. 12 retouched images included.',payments:[]},
+        {id:'e8',type:'Corporate',title:'Zenith Product Launch',dateISO:'2026-06-30',timeLabel:'10:00 AM – 4:00 PM',venue:'Grand Hyatt, Mumbai',clientName:'Sameer Joshi',clientPhone:'+91 98330 90021',assigned:[{id:'a2',role:'Lead Photographer'},{id:'a4',role:'Videographer'},{id:'a5',role:'Editor'}],total:95000,notes:'Press wall + product close-ups. NDA in effect on unreleased product.',payments:[]},
+        {id:'e6',type:'Wedding',title:'Riya & Karan Wedding',dateISO:'2026-07-04',timeLabel:'3:00 PM – 12:00 AM',venue:'ITC Grand, Goa',clientName:'Karan Malhotra',clientPhone:'+91 90040 67712',assigned:[{id:'a1',role:'Lead Photographer'},{id:'a2',role:'Photographer'},{id:'a3',role:'Photographer'},{id:'a4',role:'Videographer'}],total:220000,notes:'Destination wedding, two-day coverage. Travel and stay already booked.',payments:[{dateISO:'2026-03-30',amount:50000,method:'Bank transfer',note:'Booking advance'}]},
+      ],
+      B: [
+        {id:'b1',type:'Wedding',title:'Nair Wedding Film',dateISO:'2026-06-14',timeLabel:'5:00 PM – 11:00 PM',venue:'Bolgatty Palace, Kochi',clientName:'Arun Nair',clientPhone:'+91 94470 11200',assigned:[{id:'a1',role:'Director'},{id:'b2',role:'Cinematographer'},{id:'b3',role:'Editor'}],total:160000,notes:'Cinematic wedding film plus a 3-minute teaser.',payments:[{dateISO:'2026-05-10',amount:80000,method:'Bank transfer',note:'50% advance'}]},
+        {id:'b2e',type:'Corporate',title:'Acme Brand Video',dateISO:'2026-06-22',timeLabel:'10:00 AM – 5:00 PM',venue:'Acme HQ, Pune',clientName:'Tara Shah',clientPhone:'+91 98220 44556',assigned:[{id:'b2',role:'Cinematographer'},{id:'b3',role:'Editor'}],total:90000,notes:'Two brand films and a set of social reels.',payments:[{dateISO:'2026-05-25',amount:90000,method:'Bank transfer',note:'Paid in full'}]},
+        {id:'b3e',type:'Event',title:'Soundscape Aftermovie',dateISO:'2026-07-02',timeLabel:'6:00 PM – 1:00 AM',venue:'Mahalaxmi Grounds, Mumbai',clientName:'Festival Co.',clientPhone:'+91 90000 12345',assigned:[{id:'a1',role:'Director'},{id:'b2',role:'Cinematographer'}],total:60000,notes:'Multi-cam festival aftermovie.',payments:[]},
+      ],
+    },
+  };
+
+  TYPES = {
+    Wedding:    {label:'Wedding',     c:'#FF4D8D', soft:'#FFEAF1', grad:'linear-gradient(135deg,#FF6FA3,#FF2D7E)'},
+    PreWedding: {label:'Pre-Wedding', c:'#7C5CFC', soft:'#EFEBFF', grad:'linear-gradient(135deg,#9B7CFF,#6A3DF5)'},
+    Corporate:  {label:'Corporate',   c:'#2E8BFF', soft:'#E6F1FF', grad:'linear-gradient(135deg,#5BA8FF,#1E6FE0)'},
+    Portrait:   {label:'Portrait',    c:'#F59E0B', soft:'#FFF3DE', grad:'linear-gradient(135deg,#FFC44D,#F38B00)'},
+    Event:      {label:'Event',       c:'#12C9A6', soft:'#E2FAF3', grad:'linear-gradient(135deg,#3DDCBC,#06B894)'},
+  };
+
+  TEAMS = {
+    A: {name:'Lumière Co.', initials:'LC', color:'#7C5CFC', role:'Owner', members:[
+      {id:'a1',name:'Aanya Mehra',role:'Owner · Lead Photographer',color:'#7C5CFC',you:true},
+      {id:'a2',name:'Rohan Kapoor',role:'Photographer',color:'#FF6B5E'},
+      {id:'a3',name:'Diya Sharma',role:'Photographer',color:'#12C9A6'},
+      {id:'a4',name:'Kabir Singh',role:'Videographer',color:'#2E8BFF'},
+      {id:'a5',name:'Ishaan Verma',role:'Editor',color:'#F59E0B'},
+    ]},
+    B: {name:'Frame Films', initials:'FF', color:'#FF6B5E', role:'Member', members:[
+      {id:'a1',name:'Aanya Mehra',role:'Director',color:'#7C5CFC',you:true},
+      {id:'b2',name:'Maya Iyer',role:'Cinematographer',color:'#FF4D8D'},
+      {id:'b3',name:'Dev Patel',role:'Editor',color:'#12C9A6'},
+    ]},
+  };
+
+  ACCENTS = {
+    Violet:  {solid:'#6C4CF1', grad:'linear-gradient(135deg,#7C5CFC 0%,#C13FE8 100%)', soft:'#EFEBFF', ink:'#5B3DE0'},
+    Coral:   {solid:'#FF5A5F', grad:'linear-gradient(135deg,#FF7A5C 0%,#FF3D7F 100%)', soft:'#FFECEC', ink:'#E23E5A'},
+    Emerald: {solid:'#0FB48C', grad:'linear-gradient(135deg,#21D0A6 0%,#0E9E8F 100%)', soft:'#E2FAF3', ink:'#0A8F73'},
+    Blue:    {solid:'#2E7DFF', grad:'linear-gradient(135deg,#4F9BFF 0%,#7C5CFC 100%)', soft:'#E8F1FF', ink:'#1F63E0'},
+  };
+
+  MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  WD = ['S','M','T','W','T','F','S'];
+  TODAY = '2026-06-26';
+
+  // ---- helpers ----
+  inr(n){ return '₹' + Math.round(n).toLocaleString('en-IN'); }
+  short(n){
+    if(n>=100000){ let v=n/100000; return '₹'+(v%1===0?v.toFixed(0):v.toFixed(2).replace(/0+$/,'').replace(/\.$/,''))+'L'; }
+    if(n>=1000) return '₹'+Math.round(n/1000)+'K';
+    return '₹'+n;
+  }
+  paidOf(e){ return e.payments.reduce((s,p)=>s+p.amount,0); }
+  pd(iso){ const a=iso.split('-').map(Number); return new Date(a[0],a[1]-1,a[2]); }
+  iso(dt){ const p=x=>String(x).padStart(2,'0'); return dt.getFullYear()+'-'+p(dt.getMonth()+1)+'-'+p(dt.getDate()); }
+  fmtLong(iso){ const d=this.pd(iso); const wd=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()]; return wd+', '+d.getDate()+' '+this.MONTHS[d.getMonth()]+' '+d.getFullYear(); }
+  fmtMed(iso){ const d=this.pd(iso); const wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]; return wd+', '+d.getDate()+' '+this.MONTHS[d.getMonth()]; }
+  monthBase(){ const b=new Date(2026,5,1); b.setMonth(b.getMonth()+this.state.monthOffset); return b; }
+  teamEvents(){ return this.state.events[this.state.teamId] || []; }
+  findEvent(id){ return this.teamEvents().find(e=>e.id===id); }
+  initialsOf(name){ const p=name.trim().split(/\s+/); return ((p[0]||'')[0]||'') + ((p[1]||'')[0]||''); }
+  memberName(id){ const m=(this.TEAMS[this.state.teamId].members.find(x=>x.id===id)); return m?m.name:'Crew'; }
+  memberColor(id){ const m=(this.TEAMS[this.state.teamId].members.find(x=>x.id===id)); return m?m.color:'#9C95B4'; }
+
+  showToast(msg){ this.setState({toast:msg}); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}),1800); }
+
+  componentDidMount(){ this._fit=()=>{ const h=window.innerHeight; this.setState({scale:Math.min(1,(h-24)/940)}); }; this._fit(); window.addEventListener('resize',this._fit); }
+  componentWillUnmount(){ window.removeEventListener('resize',this._fit); clearTimeout(this._tt); }
+
+  renderVals(){
+    const S=this.state;
+    const acc = this.ACCENTS[this.props.accent || 'Violet'] || this.ACCENTS.Violet;
+    const team = this.TEAMS[S.teamId];
+    const evs = this.teamEvents();
+    const base = this.monthBase();
+    const yr = base.getFullYear(), mo = base.getMonth();
+    const monthLabel = ['January','February','March','April','May','June','July','August','September','October','November','December'][mo]+' '+yr;
+
+    // month metrics
+    const monthEvs = evs.filter(e=>{ const d=this.pd(e.dateISO); return d.getFullYear()===yr && d.getMonth()===mo; });
+    let booked=0, collected=0;
+    monthEvs.forEach(e=>{ booked+=e.total; collected+=this.paidOf(e); });
+    const outstanding = booked - collected;
+    const collectedPct = booked>0 ? Math.round(collected/booked*100)+'%' : '0%';
+    const prev = Math.round(collected/1.18);
+    const dueEvs = monthEvs.filter(e=>e.total-this.paidOf(e)>0);
+    const todayD = this.pd(this.TODAY);
+    const doneCount = monthEvs.filter(e=>this.pd(e.dateISO) < todayD).length;
+    const upCount = monthEvs.length - doneCount;
+
+    // category
+    const catMap={};
+    monthEvs.forEach(e=>{ catMap[e.type]=(catMap[e.type]||0)+e.total; });
+    const cats = Object.keys(catMap).map(k=>({type:k,amount:catMap[k],T:this.TYPES[k]})).sort((a,b)=>b.amount-a.amount);
+    const catSegs = cats.map(c=>({color:c.T.c, width: booked>0?(c.amount/booked*100)+'%':'0%'}));
+    const catLegend = cats.map(c=>({label:c.T.label, color:c.T.c, pct: booked>0?Math.round(c.amount/booked*100)+'%':'0%', amount:this.short(c.amount)}));
+
+    // upcoming (from today, across months)
+    const allUp = evs.filter(e=>this.pd(e.dateISO) >= todayD).sort((a,b)=>this.pd(a.dateISO)-this.pd(b.dateISO)).slice(0,3);
+    const mkCard = e=>{ const T=this.TYPES[e.type]; const d=this.pd(e.dateISO); const pend=e.total-this.paidOf(e);
+      return {id:e.id, title:e.title, grad:T.grad, color:T.c, soft:T.soft, typeLabel:T.label, dd:d.getDate(), mon:this.MONTHS[d.getMonth()],
+        timeShort:e.timeLabel.split(' – ')[0], clientName:e.clientName,
+        dueLabel: pend>0?'Pending':'Settled', dueAmt: pend>0?this.short(pend):'Paid', dueColor: pend>0?'#FF6B5E':'#12C9A6',
+        open:()=>this.openEvent(e.id)}; };
+    const upcoming = allUp.map(mkCard);
+
+    // dues list (top by amount)
+    const dues = dueEvs.map(e=>({e, pend:e.total-this.paidOf(e)})).sort((a,b)=>b.pend-a.pend).slice(0,4).map((x,i,arr)=>{
+      const T=this.TYPES[x.e.type];
+      return {id:x.e.id, title:x.e.title, client:x.e.clientName, amount:this.short(x.pend), color:T.c, soft:T.soft,
+        initials:this.initialsOf(x.e.clientName), border:i===arr.length-1?'transparent':'#F2F0F8', open:()=>this.openEvent(x.e.id)};
+    });
+
+    // calendar grid
+    const first=new Date(yr,mo,1); const startDow=first.getDay();
+    const gridStart=new Date(yr,mo,1-startDow);
+    const weeks=[];
+    for(let w=0;w<6;w++){ const days=[];
+      for(let d=0;d<7;d++){ const dt=new Date(gridStart); dt.setDate(gridStart.getDate()+w*7+d);
+        const iso=this.iso(dt); const inMonth=dt.getMonth()===mo;
+        const dayEvs=evs.filter(e=>e.dateISO===iso);
+        const isToday=iso===this.TODAY; const isSel=iso===S.selectedDate;
+        let bg='transparent', fg=inMonth?'#1A1430':'#CBC6DA', ring='none';
+        if(isSel){ bg=acc.grad; fg='#fff'; }
+        else if(isToday){ ring='1.5px solid '+acc.solid; fg=acc.ink; }
+        const dots=dayEvs.slice(0,3).map(e=>({c:isSel?'rgba(255,255,255,.9)':this.TYPES[e.type].c}));
+        days.push({label:dt.getDate(), dateISO:iso, bg, fg, ring, dots, pick:()=>this.setState({selectedDate:iso})});
+      }
+      weeks.push({days});
+    }
+    const selEvs=evs.filter(e=>e.dateISO===S.selectedDate).sort((a,b)=>a.timeLabel.localeCompare(b.timeLabel));
+    const selCards=selEvs.map(e=>{ const T=this.TYPES[e.type]; return {id:e.id,title:e.title,color:T.c,soft:T.soft,typeLabel:T.label,timeLabel:e.timeLabel,venue:e.venue,open:()=>this.openEvent(e.id)}; });
+
+    // events tab list
+    let list=[...evs];
+    if(S.filter==='upcoming') list=list.filter(e=>this.pd(e.dateISO)>=todayD);
+    if(S.filter==='unpaid') list=list.filter(e=>e.total-this.paidOf(e)>0);
+    list.sort((a,b)=>this.pd(a.dateISO)-this.pd(b.dateISO));
+    const eventsList=list.map(e=>{ const T=this.TYPES[e.type]; const d=this.pd(e.dateISO); const pend=e.total-this.paidOf(e); const paid=this.paidOf(e);
+      let sl,sc,sb;
+      if(paid===0){ sl='Unpaid'; sc='#FF6B5E'; sb='#FFEDEA'; }
+      else if(pend===0){ sl='Paid'; sc='#12C9A6'; sb='#E2FAF3'; }
+      else { sl=this.short(pend)+' due'; sc='#F59E0B'; sb='#FFF3DE'; }
+      return {id:e.id,title:e.title,grad:T.grad,color:T.c,soft:T.soft,typeLabel:T.label,clientName:e.clientName,
+        dd:d.getDate(),mon:this.MONTHS[d.getMonth()],statusLabel:sl,statusColor:sc,statusBg:sb,open:()=>this.openEvent(e.id)};
+    });
+
+    // detail
+    let detail=null;
+    const oe=this.findEvent(S.openId);
+    if(oe){ const T=this.TYPES[oe.type]; const paid=this.paidOf(oe); const pend=oe.total-paid;
+      let ps,pc,pb;
+      if(paid===0){ ps='Awaiting payment'; pc='#FF6B5E'; pb='#FFEDEA'; }
+      else if(pend===0){ ps='Fully paid'; pc='#12C9A6'; pb='#E2FAF3'; }
+      else { ps='Partially paid'; pc='#F59E0B'; pb='#FFF3DE'; }
+      detail={ grad:T.grad, color:T.c, soft:T.soft, typeLabel:T.label, title:oe.title,
+        dateLabel:this.fmtLong(oe.dateISO), timeLabel:oe.timeLabel, venue:oe.venue,
+        clientName:oe.clientName, clientPhone:oe.clientPhone, clientInitials:this.initialsOf(oe.clientName),
+        total:this.inr(oe.total), paid:this.inr(paid), pending:this.inr(pend),
+        paidPct: oe.total>0?Math.round(paid/oe.total*100)+'%':'0%',
+        payStatus:ps, payColor:pc, payBg:pb, hasPayments:oe.payments.length>0,
+        payments: oe.payments.slice().reverse().map(p=>({note:p.note, method:p.method, dateLabel:this.fmtMed(p.dateISO), amount:this.inr(p.amount)})),
+        team: oe.assigned.map(a=>({initials:this.initialsOf(this.memberName(a.id)), name:this.memberName(a.id), role:a.role, color:this.memberColor(a.id)})),
+        notes: oe.notes };
+    } else {
+      detail={ grad:acc.grad, color:acc.solid, soft:acc.soft, typeLabel:'', title:'', dateLabel:'', timeLabel:'', venue:'', clientName:'', clientPhone:'', clientInitials:'', total:'', paid:'', pending:'', paidPct:'0%', payStatus:'', payColor:'#999', payBg:'#eee', hasPayments:false, payments:[], team:[], notes:'' };
+    }
+
+    // role chips
+    const roles=['Lead Photographer','Photographer','Videographer','Editor'];
+    const roleChips=roles.map(r=>{ const on=S.studioRole===r; return {label:r, bg:on?acc.soft:'#fff', fg:on?acc.ink:'#6B6486', bd:on?acc.solid:'#E6E3F0', pick:()=>this.setState({studioRole:r})}; });
+
+    // code boxes
+    const code=(S.joinCode||'').toUpperCase().slice(0,6);
+    const codeBoxes=[0,1,2,3,4,5].map(i=>({ch:code[i]||'', bd:code[i]?acc.solid:'#E6E3F0'}));
+    const joinOk=code.length>0;
+
+    // teams list
+    const teamsList=Object.keys(this.TEAMS).map(k=>{ const t=this.TEAMS[k]; const cnt=t.members.length; const active=k===S.teamId;
+      return {id:k, name:t.name, initials:t.initials, color:t.color, role:t.role, memberLabel:cnt+' members', active,
+        rowBg:active?acc.soft:'#F8F7FC', border:'#F2F0F8', pick:()=>this.switchTeam(k)};
+    });
+
+    // members
+    const members=team.members.map((m,i,arr)=>({name:m.name, role:m.role, color:m.color, initials:this.initialsOf(m.name), you:!!m.you, border:i===arr.length-1?'transparent':'#F2F0F8'}));
+
+    // pay methods
+    const payMethods=['UPI','Cash','Bank transfer','Card'].map(m=>{ const on=S.payMethod===m; return {label:m, bg:on?acc.soft:'#F6F5FB', fg:on?acc.ink:'#6B6486', bd:on?acc.solid:'#E6E3F0', pick:()=>this.setState({payMethod:m})}; });
+
+    // type chips (new event)
+    const typeChips=Object.keys(this.TYPES).map(k=>{ const on=S.newType===k; const T=this.TYPES[k]; return {label:T.label, bg:on?T.soft:'#F6F5FB', fg:on?T.c:'#6B6486', bd:on?T.c:'#E6E3F0', pick:()=>this.setState({newType:k})}; });
+
+    // filters
+    const filters=[['all','All'],['upcoming','Upcoming'],['unpaid','Unpaid']].map(([k,l])=>{ const on=S.filter===k; return {label:l, bg:on?acc.solid:'#fff', fg:on?'#fff':'#6B6486', bd:on?acc.solid:'#ECEAF4', pick:()=>this.setState({filter:k})}; });
+
+    // nav colors
+    const muted='#B3ABC8';
+    const nav={
+      home: S.tab==='dashboard'?acc.solid:muted,
+      cal:  S.tab==='calendar'?acc.solid:muted,
+      evt:  S.tab==='events'?acc.solid:muted,
+      prof: S.tab==='profile'?acc.solid:muted,
+    };
+
+    const inApp=S.screen==='app';
+    const vDetail=inApp && !!S.openId;
+    const showNav=inApp && !S.openId;
+    const darkChrome = S.screen==='signin'||S.screen==='onboard';
+
+    const hr=new Date().getHours();
+    const greeting='Studio overview';
+
+    return {
+      // chrome
+      statusColor: darkChrome?'#FFFFFF':'#1A1430',
+      pillColor: darkChrome?'#FFFFFF':'#1A1430',
+      accentGrad:acc.grad, accentSolid:acc.solid, accentSoft:acc.soft, accentInk:acc.ink,
+      // screen flags
+      vSignin:S.screen==='signin', vOnboard:S.screen==='onboard', vCreate:S.screen==='create', vJoin:S.screen==='join',
+      tabDashboard:inApp&&!S.openId&&S.tab==='dashboard',
+      tabCalendar:inApp&&!S.openId&&S.tab==='calendar',
+      tabEvents:inApp&&!S.openId&&S.tab==='events',
+      tabProfile:inApp&&!S.openId&&S.tab==='profile',
+      vDetail, showNav,
+      // sheets
+      sheetTeam:S.sheet==='team', sheetPay:S.sheet==='pay', sheetNew:S.sheet==='new', sheetDelete:S.sheet==='delete', sheetCall:S.sheet==='call',
+      toast:!!S.toast, toastMsg:S.toast,
+      // team header
+      team:{name:team.name, initials:team.initials, color:team.color, role:team.role, memberLabel:team.members.length+' members'},
+      greeting,
+      // dashboard
+      monthLabel,
+      collected:this.inr(collected), trendPct:'+18%',
+      bookedLabel:'of '+this.inr(booked)+' booked', bookedShort:this.short(booked),
+      collectedPct, outstanding:this.inr(outstanding), duesCount:dueEvs.length+' dues',
+      eventsTotal:monthEvs.length, eventsDone:doneCount+' done', eventsUp:upCount+' upcoming',
+      catSegs, catLegend, upcoming, dues, scale:S.scale, scaleW:Math.round(412*S.scale), scaleH:Math.round(880*S.scale),
+      // calendar
+      weekdays:this.WD.map(l=>({l})), weeks,
+      selectedDayLabel:this.fmtMed(S.selectedDate),
+      selectedCount: selCards.length>0?(selCards.length+(selCards.length===1?' event':' events')):'No events',
+      selectedEvents:selCards, hasSelectedEvents:selCards.length>0, noSelectedEvents:selCards.length===0,
+      // events tab
+      filters, eventsList,
+      // detail
+      detail,
+      // profile
+      members, isOwner:team.role==='Owner', inviteCode:S.inviteCode, codeExpiry:'7 days',
+      copyLabel:S.copied?'Code copied':'Generate new code', teamsList,
+      // create
+      studioName:S.studioName, studioPreview:(S.studioName||'Your studio'), studioInitials:(this.initialsOf(S.studioName||'Your Studio')||'YS'), roleChips,
+      // join
+      joinCode:S.joinCode, codeBoxes, joinBtnBg:joinOk?acc.grad:'#E6E3F0', joinBtnFg:joinOk?'#fff':'#B3ABC8',
+      // pay sheet
+      payAmount:S.payAmount, payMethods,
+      // new sheet
+      newTitle:S.newTitle, typeChips, newTotal:S.newTotal, newDateLabel:this.fmtMed(S.selectedDate),
+      // call
+      callName:S.callName, callPhone:S.callPhone, callInitials:S.callInitials,
+      nav,
+      // handlers
+      signIn:()=>this.setState({screen:'onboard'}),
+      gotoCreate:()=>this.setState({screen:'create'}),
+      gotoJoin:()=>this.setState({screen:'join'}),
+      gotoOnboard:()=>this.setState({screen:'onboard'}),
+      doCreate:()=>{ this.showToast('Studio created'); this.setState({screen:'app',tab:'dashboard'}); },
+      doJoin:()=>{ if(!joinOk) return; this.showToast('Joined Lumière Co.'); this.setState({screen:'app',tab:'dashboard',teamId:'A'}); },
+      onStudioName:e=>this.setState({studioName:e.target.value}),
+      onJoinCode:e=>this.setState({joinCode:e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6)}),
+      goDashboard:()=>this.setState({tab:'dashboard',openId:null}),
+      goCalendar:()=>this.setState({tab:'calendar',openId:null}),
+      goEvents:()=>this.setState({tab:'events',openId:null}),
+      goProfile:()=>this.setState({tab:'profile',openId:null}),
+      prevMonth:()=>this.setState(s=>({monthOffset:s.monthOffset-1})),
+      nextMonth:()=>this.setState(s=>({monthOffset:s.monthOffset+1})),
+      goToday:()=>this.setState({monthOffset:0,selectedDate:this.TODAY}),
+      openTeamSheet:()=>this.setState({sheet:'team'}),
+      openNewSheet:()=>this.setState({sheet:'new'}),
+      openPaySheet:()=>this.setState({sheet:'pay',payAmount:'',payMethod:'UPI'}),
+      openDeleteSheet:()=>this.setState({sheet:'delete'}),
+      closeSheet:()=>this.setState({sheet:null}),
+      stop:e=>{ e.stopPropagation(); },
+      back:()=>this.setState({openId:null}),
+      onPayAmount:e=>this.setState({payAmount:e.target.value.replace(/[^0-9]/g,'')}),
+      submitPayment:()=>this.submitPayment(),
+      onNewTitle:e=>this.setState({newTitle:e.target.value}),
+      onNewTotal:e=>this.setState({newTotal:e.target.value.replace(/[^0-9]/g,'')}),
+      submitEvent:()=>this.submitEvent(),
+      callClient:()=>{ if(oe) this.setState({sheet:'call',callName:oe.clientName,callPhone:oe.clientPhone,callInitials:this.initialsOf(oe.clientName)}); },
+      endCall:()=>this.setState({sheet:null}),
+      doDelete:()=>{ const id=S.openId; this.setState(s=>{ const ev={...s.events}; ev[s.teamId]=ev[s.teamId].filter(x=>x.id!==id); return {events:ev,openId:null,sheet:null}; }); this.showToast('Event deleted'); },
+      copyCode:()=>{ this.setState({copied:true}); this.showToast('Code copied'); setTimeout(()=>this.setState({copied:false}),1600); },
+      regenCode:()=>{ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r=''; for(let i=0;i<6;i++) r+=c[Math.floor(Math.random()*c.length)]; this.setState({inviteCode:r}); this.showToast('New code generated'); },
+      switchTeam:k=>this.switchTeam(k),
+      signOut:()=>this.setState({screen:'signin',tab:'dashboard',openId:null,sheet:null}),
+    };
+  }
+
+  switchTeam(k){ this.setState({teamId:k, sheet:null, openId:null, tab:'dashboard', selectedDate:'2026-06-27', monthOffset:0}); this.showToast('Switched to '+this.TEAMS[k].name); }
+
+  submitPayment(){
+    const amt=parseInt(this.state.payAmount,10);
+    const id=this.state.openId;
+    if(!amt||amt<=0||!id){ this.showToast('Enter an amount'); return; }
+    this.setState(s=>{
+      const ev={...s.events}; const arr=ev[s.teamId].map(e=>{
+        if(e.id!==id) return e;
+        return {...e, payments:[...e.payments, {dateISO:this.TODAY, amount:amt, method:s.payMethod, note:'Payment received'}]};
+      });
+      ev[s.teamId]=arr; return {events:ev, sheet:null, payAmount:''};
+    });
+    this.showToast('Payment of '+this.inr(amt)+' recorded');
+  }
+
+  submitEvent(){
+    const t=this.state.newTitle.trim();
+    if(!t){ this.showToast('Add a title'); return; }
+    const total=parseInt(this.state.newTotal,10)||0;
+    const id='n'+Date.now();
+    const ne={id, type:this.state.newType, title:t, dateISO:this.state.selectedDate, timeLabel:'10:00 AM – 2:00 PM', venue:'To be confirmed', clientName:'New client', clientPhone:'+91 90000 00000', assigned:[{id:'a1',role:'Lead Photographer'}], total, notes:'Added from quick create. Edit to add full details.', payments:[]};
+    this.setState(s=>{ const ev={...s.events}; ev[s.teamId]=[...ev[s.teamId], ne]; return {events:ev, sheet:null, newTitle:'', newTotal:'', tab:'calendar'}; });
+    this.showToast('Event created');
+  }
+
+  openEvent(id){ this.setState({openId:id, sheet:null}); const el=document.querySelector('[data-detail-scroll]'); }
+}
+</script>
+</body>
+</html>
