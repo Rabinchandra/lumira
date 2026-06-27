@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { EVENTS, TEAMS, Event, Team } from '../constants/data';
+import { EVENTS, TEAMS, Event, Team, Assignment } from '../constants/data';
 import { TODAY } from '../constants/helpers';
 
 type Screen = 'signin' | 'onboard' | 'create' | 'join' | 'app';
@@ -16,7 +16,7 @@ export type AppState = {
   teams: Record<string, Team>;
   filter: 'all' | 'upcoming' | 'unpaid';
   studioName: string;
-  studioRole: string;
+  studioRole: string[];
   joinCode: string;
   payAmount: string;
   payMethod: string;
@@ -35,7 +35,7 @@ type Action =
   | { type: 'OPEN_EVENT'; id: string | null }
   | { type: 'SET_FILTER'; filter: 'all' | 'upcoming' | 'unpaid' }
   | { type: 'SET_STUDIO_NAME'; name: string }
-  | { type: 'SET_STUDIO_ROLE'; role: string }
+  | { type: 'TOGGLE_STUDIO_ROLE'; role: string }
   | { type: 'SET_JOIN_CODE'; code: string }
   | { type: 'SET_PAY_AMOUNT'; amount: string }
   | { type: 'SET_PAY_METHOD'; method: string }
@@ -45,6 +45,7 @@ type Action =
   | { type: 'ADD_PAYMENT'; eventId: string; amount: number; method: string }
   | { type: 'ADD_EVENT'; teamId: string; event: Event }
   | { type: 'DELETE_EVENT'; eventId: string }
+  | { type: 'UPDATE_EVENT_CREW'; eventId: string; assigned: Assignment[] }
   | { type: 'REGEN_CODE'; teamId: string }
   | { type: 'SIGN_OUT' };
 
@@ -59,7 +60,7 @@ const initialState: AppState = {
   teams: TEAMS,
   filter: 'all',
   studioName: '',
-  studioRole: 'Lead Photographer',
+  studioRole: ['Lead Photographer'],
   joinCode: '',
   payAmount: '',
   payMethod: 'UPI',
@@ -87,8 +88,13 @@ function reducer(state: AppState, action: Action): AppState {
       return { ...state, filter: action.filter };
     case 'SET_STUDIO_NAME':
       return { ...state, studioName: action.name };
-    case 'SET_STUDIO_ROLE':
-      return { ...state, studioRole: action.role };
+    case 'TOGGLE_STUDIO_ROLE':
+      return {
+        ...state,
+        studioRole: state.studioRole.includes(action.role)
+          ? state.studioRole.filter(r => r !== action.role)
+          : [...state.studioRole, action.role],
+      };
     case 'SET_JOIN_CODE':
       return { ...state, joinCode: action.code };
     case 'SET_PAY_AMOUNT':
@@ -126,6 +132,13 @@ function reducer(state: AppState, action: Action): AppState {
       const updated = { ...state.events };
       updated[state.teamId] = updated[state.teamId].filter(e => e.id !== action.eventId);
       return { ...state, events: updated, openEventId: null };
+    }
+    case 'UPDATE_EVENT_CREW': {
+      const updated = { ...state.events };
+      updated[state.teamId] = updated[state.teamId].map(e =>
+        e.id === action.eventId ? { ...e, assigned: action.assigned } : e
+      );
+      return { ...state, events: updated };
     }
     case 'REGEN_CODE': {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';

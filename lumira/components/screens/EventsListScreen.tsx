@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
@@ -71,10 +70,10 @@ export default function EventsListScreen({ }: Props) {
               style={styles.eventCard}
               onPress={() => dispatch({ type: 'OPEN_EVENT', id: ev.id })}
             >
-              <LinearGradient colors={T?.grad || ['#999', '#666']} style={styles.dateBadge}>
+              <View style={[styles.dateBadge, { backgroundColor: T?.color || '#999' }]}>
                 <Text style={styles.dateDD}>{d.getDate()}</Text>
                 <Text style={styles.dateMon}>{MONTHS_SHORT[d.getMonth()]}</Text>
-              </LinearGradient>
+              </View>
               <View style={styles.eventInfo}>
                 <Text style={styles.eventTitle} numberOfLines={1}>{ev.title}</Text>
                 <View style={styles.metaRow}>

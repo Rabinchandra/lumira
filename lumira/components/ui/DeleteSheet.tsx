@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Modal } from 'react-native';
 import { useApp } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
 import { PopIn, Pressable } from './anim';
+import Icon from './Icon';
 
 type Props = { onClose: () => void; showToast: (m: string) => void };
 
@@ -22,7 +23,7 @@ export default function DeleteSheet({ onClose, showToast }: Props) {
       <View style={styles.backdrop}>
         <PopIn from={0.85} style={styles.card}>
           <PopIn delay={90} from={0.5} style={styles.iconCircle}>
-            <Text style={styles.icon}>{'×'}</Text>
+            <Icon name="trash" size={26} color={COLORS.red} strokeWidth={2} />
           </PopIn>
           <Text style={styles.title}>Delete event?</Text>
           <Text style={styles.body}>

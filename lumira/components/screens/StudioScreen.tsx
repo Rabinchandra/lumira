@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
 import { initials } from '../../constants/helpers';
 import { SheetType } from './AppShell';
 import { FadeInUp, Pressable } from '../ui/anim';
+import Icon from '../ui/Icon';
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
@@ -38,9 +38,9 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
 
         {/* User profile card */}
         <FadeInUp index={1} style={styles.profileCard}>
-          <LinearGradient colors={ACCENT.grad} style={styles.profileAvatar}>
+          <View style={[styles.profileAvatar, { backgroundColor: ACCENT.solid }]}>
             <Text style={styles.profileAvatarText}>AM</Text>
-          </LinearGradient>
+          </View>
           <View>
             <Text style={styles.profileName}>Aanya Mehra</Text>
             <Text style={styles.profileEmail}>aanya@lumiere.co</Text>
@@ -76,7 +76,7 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
         {/* Invite code (owner only) */}
         {isOwner && (
           <FadeInUp index={4}>
-          <LinearGradient colors={ACCENT.grad} style={styles.inviteCard}>
+          <View style={styles.inviteCard}>
             <View style={styles.inviteBlob} />
             <View style={styles.inviteContent}>
               <Text style={styles.inviteLabel}>Invite code · expires in 7 days</Text>
@@ -90,7 +90,7 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
                 <Text style={styles.regenText}>↺  Generate new code</Text>
               </Pressable>
             </View>
-          </LinearGradient>
+          </View>
           </FadeInUp>
         )}
 
@@ -119,7 +119,7 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
                 </View>
                 {active && (
                   <View style={[styles.checkCircle, { backgroundColor: ACCENT.solid }]}>
-                    <Text style={styles.checkMark}>✓</Text>
+                    <Icon name="check" size={13} color="#fff" strokeWidth={2.6} />
                   </View>
                 )}
               </TouchableOpacity>
@@ -133,7 +133,7 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
             style={styles.signOutBtn}
             onPress={() => dispatch({ type: 'SIGN_OUT' })}
           >
-            <Text style={styles.signOutIcon}>→</Text>
+            <Icon name="logout" size={18} color={COLORS.red} strokeWidth={2.1} />
             <Text style={styles.signOutText}>Sign out</Text>
           </Pressable>
         </FadeInUp>
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   youBadge: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: 7 },
   youText: { fontFamily: 'DMSans_600SemiBold', fontSize: 11 },
 
-  inviteCard: { borderRadius: 20, padding: 18, marginBottom: 14, overflow: 'hidden' },
+  inviteCard: { backgroundColor: ACCENT.solid, borderRadius: 20, padding: 18, marginBottom: 14, overflow: 'hidden' },
   inviteBlob: {
     position: 'absolute', bottom: -30, right: -20,
     width: 120, height: 120, borderRadius: 60,

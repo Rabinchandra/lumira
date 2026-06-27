@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
@@ -11,6 +10,7 @@ import {
 import { SheetType } from './AppShell';
 import { Event } from '../../constants/data';
 import { FadeInUp, Pressable, AnimatedBar } from '../ui/anim';
+import Icon from '../ui/Icon';
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
@@ -83,9 +83,9 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
           <TouchableOpacity
             onPress={() => dispatch({ type: 'SET_TAB', tab: 'studio' })}
           >
-            <LinearGradient colors={ACCENT.grad} style={styles.userAvatar}>
+            <View style={[styles.userAvatar, { backgroundColor: ACCENT.solid }]}>
               <Text style={styles.userAvatarText}>AM</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </FadeInUp>
 
@@ -97,21 +97,21 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
               onPress={() => dispatch({ type: 'SET_MONTH_OFFSET', offset: state.monthOffset - 1 })}
               style={styles.monthArrow}
             >
-              <Text style={styles.arrowText}>‹</Text>
+              <Icon name="chevron-left" size={18} color={COLORS.textSecondary} />
             </TouchableOpacity>
             <Text style={styles.monthLabel}>{label}</Text>
             <TouchableOpacity
               onPress={() => dispatch({ type: 'SET_MONTH_OFFSET', offset: state.monthOffset + 1 })}
               style={styles.monthArrow}
             >
-              <Text style={styles.arrowText}>›</Text>
+              <Icon name="chevron-right" size={18} color={COLORS.textSecondary} />
             </TouchableOpacity>
           </View>
         </FadeInUp>
 
         {/* Hero revenue card */}
         <FadeInUp index={2}>
-          <LinearGradient colors={ACCENT.grad} style={styles.heroCard}>
+          <View style={styles.heroCard}>
             <View style={styles.heroBlob} />
             <Text style={styles.heroSub}>Collected this month</Text>
             <View style={styles.heroAmtRow}>
@@ -124,7 +124,7 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
             <View style={styles.progressBg}>
               <AnimatedBar pct={collectedPct} style={styles.progressFill} />
             </View>
-          </LinearGradient>
+          </View>
         </FadeInUp>
 
         {/* Two tiles */}
@@ -134,7 +134,7 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
             onPress={() => dispatch({ type: 'SET_TAB', tab: 'events' })}
           >
             <View style={[styles.tileIcon, { backgroundColor: '#FFEFEA' }]}>
-              <Text style={{ fontSize: 16, color: COLORS.red }}>{'!'}</Text>
+              <Icon name="wallet" size={18} color={COLORS.red} strokeWidth={2.2} />
             </View>
             <Text style={styles.tileBig}>{formatINR(outstanding)}</Text>
             <Text style={styles.tileSub}>Outstanding · {dueEvs.length} dues</Text>
@@ -144,7 +144,7 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
             onPress={() => dispatch({ type: 'SET_TAB', tab: 'calendar' })}
           >
             <View style={[styles.tileIcon, { backgroundColor: '#E7FBF5' }]}>
-              <Text style={{ fontSize: 16, color: COLORS.green }}>{'▦'}</Text>
+              <Icon name="calendar" size={18} color={COLORS.green} />
             </View>
             <Text style={styles.tileBig}>{monthEvs.length} events</Text>
             <Text style={styles.tileSub}>{doneCount} done · {upCount} upcoming</Text>
@@ -206,10 +206,10 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
               style={styles.eventCard}
               onPress={() => dispatch({ type: 'OPEN_EVENT', id: ev.id })}
             >
-              <LinearGradient colors={T?.grad || ['#999', '#666']} style={styles.dateBadge}>
+              <View style={[styles.dateBadge, { backgroundColor: T?.color || '#999' }]}>
                 <Text style={styles.dateDD}>{d.getDate()}</Text>
                 <Text style={styles.dateMon}>{MONTHS_SHORT[d.getMonth()]}</Text>
-              </LinearGradient>
+              </View>
               <View style={styles.eventInfo}>
                 <Text style={styles.eventTitle} numberOfLines={1}>{ev.title}</Text>
                 <View style={styles.eventMeta}>
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   arrowText: { fontSize: 18, color: COLORS.textSecondary, lineHeight: 22 },
   monthLabel: { fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 13.5, color: COLORS.textPrimary, minWidth: 100, textAlign: 'center' },
 
-  heroCard: { borderRadius: 24, padding: 22, overflow: 'hidden', marginBottom: 14, shadowColor: '#7C5CFC', shadowOffset: { width: 0, height: 18 }, shadowOpacity: 0.32, shadowRadius: 30, elevation: 10 },
+  heroCard: { backgroundColor: ACCENT.solid, borderRadius: 24, padding: 22, overflow: 'hidden', marginBottom: 14, shadowColor: '#7C5CFC', shadowOffset: { width: 0, height: 18 }, shadowOpacity: 0.32, shadowRadius: 30, elevation: 10 },
   heroBlob: { position: 'absolute', top: -30, right: -20, width: 130, height: 130, borderRadius: 65, backgroundColor: 'rgba(255,255,255,0.14)' },
   heroSub: { fontFamily: 'DMSans_400Regular', fontSize: 13.5, color: 'rgba(255,255,255,0.8)' },
   heroAmtRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10, marginTop: 6 },

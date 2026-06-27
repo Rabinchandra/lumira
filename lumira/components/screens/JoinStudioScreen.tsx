@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
 import { FadeInUp, PopIn, Pressable } from '../ui/anim';
+import Icon from '../ui/Icon';
 
 export default function JoinStudioScreen() {
   const { state, dispatch } = useApp();
@@ -18,7 +19,7 @@ export default function JoinStudioScreen() {
         style={[styles.backBtn, { margin: 20 }]}
         onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'onboard' })}
       >
-        <Text style={styles.backArrow}>‹</Text>
+        <Icon name="chevron-left" size={22} color={COLORS.textPrimary} />
       </TouchableOpacity>
 
       <View style={{ paddingHorizontal: 24 }}>

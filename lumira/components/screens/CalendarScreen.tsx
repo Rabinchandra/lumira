@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
@@ -8,6 +7,7 @@ import { parseDate, toISO, monthLabel as getMonthLabel, formatMed, TODAY } from 
 import { SheetType } from './AppShell';
 import { Event } from '../../constants/data';
 import { FadeInUp, Pressable } from '../ui/anim';
+import Icon from '../ui/Icon';
 
 const WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -74,13 +74,13 @@ export default function CalendarScreen({ openSheet }: Props) {
               style={styles.navBtn}
               onPress={() => dispatch({ type: 'SET_MONTH_OFFSET', offset: state.monthOffset - 1 })}
             >
-              <Text style={styles.navBtnText}>‹</Text>
+              <Icon name="chevron-left" size={20} color={COLORS.textPrimary} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.navBtn}
               onPress={() => dispatch({ type: 'SET_MONTH_OFFSET', offset: state.monthOffset + 1 })}
             >
-              <Text style={styles.navBtnText}>›</Text>
+              <Icon name="chevron-right" size={20} color={COLORS.textPrimary} />
             </TouchableOpacity>
           </View>
         </FadeInUp>
@@ -102,9 +102,9 @@ export default function CalendarScreen({ openSheet }: Props) {
                   onPress={() => dispatch({ type: 'SET_SELECTED_DATE', date: day.dateISO })}
                 >
                   {day.isSel ? (
-                    <LinearGradient colors={ACCENT.grad} style={styles.dayCellBg}>
+                    <View style={[styles.dayCellBg, { backgroundColor: ACCENT.solid }]}>
                       <Text style={[styles.dayNum, { color: '#fff' }]}>{day.label}</Text>
-                    </LinearGradient>
+                    </View>
                   ) : (
                     <View style={[
                       styles.dayCellBg,
@@ -160,11 +160,11 @@ export default function CalendarScreen({ openSheet }: Props) {
                   </View>
                   <Text style={styles.selEventTitle}>{ev.title}</Text>
                   <View style={styles.venueRow}>
-                    <Text style={styles.venueDot}>{'◉'}</Text>
+                    <Icon name="pin" size={13} color={COLORS.textMuted} />
                     <Text style={styles.venueText}>{ev.venue}</Text>
                   </View>
                 </View>
-                <Text style={styles.chevron}>›</Text>
+                <Icon name="chevron-right" size={18} color={COLORS.textLight} />
               </Pressable>
               </FadeInUp>
             );

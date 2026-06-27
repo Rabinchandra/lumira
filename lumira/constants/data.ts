@@ -6,8 +6,10 @@ export type PaymentRecord = {
 };
 
 export type Assignment = {
-  memberId: string;
+  memberId: string;       // a team member's id, or a generated 'ext-…' id for external crew
   role: string;
+  name?: string;          // set only for external crew who aren't on the team
+  color?: string;         // avatar color for external crew
 };
 
 export type Event = {

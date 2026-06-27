@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
 import { FadeInUp, Pressable as AnimPressable } from './anim';
+import Icon from './Icon';
 
 type Props = { onClose: () => void; showToast: (m: string) => void };
 
@@ -40,7 +41,7 @@ export default function TeamSheet({ onClose, showToast }: Props) {
                 </View>
                 {active && (
                   <View style={[styles.check, { backgroundColor: ACCENT.solid }]}>
-                    <Text style={styles.checkMark}>✓</Text>
+                    <Icon name="check" size={13} color="#fff" strokeWidth={2.6} />
                   </View>
                 )}
               </AnimPressable>

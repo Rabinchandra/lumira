@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated } from 'react
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ACCENT } from '../../constants/colors';
+import Icon from './Icon';
 import { initials } from '../../constants/helpers';
 
 type Props = { name: string; phone: string; onEnd: () => void };
@@ -38,7 +39,7 @@ export default function CallingOverlay({ name, phone, onEnd }: Props) {
         </View>
 
         <TouchableOpacity style={styles.endBtn} onPress={onEnd}>
-          <Text style={styles.endIcon}>✕</Text>
+          <Icon name="phone" size={26} color="#fff" strokeWidth={2.2} />
         </TouchableOpacity>
       </LinearGradient>
     </Modal>

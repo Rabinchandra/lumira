@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { FadeInUp, Pressable } from '../ui/anim';
+import Icon from '../ui/Icon';
 
 export default function OnboardScreen() {
   const { dispatch } = useApp();
@@ -35,7 +36,7 @@ export default function OnboardScreen() {
           <Pressable onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'create' })}>
             <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.createCard}>
               <View style={styles.cardIconBox}>
-                <Text style={styles.cardIcon}>＋</Text>
+                <Icon name="plus" size={24} color="#fff" strokeWidth={2.4} />
               </View>
               <Text style={styles.cardTitle}>Create a studio</Text>
               <Text style={styles.cardSub}>Start fresh and invite your team</Text>
@@ -50,7 +51,7 @@ export default function OnboardScreen() {
             onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'join' })}
           >
             <View style={styles.joinIconBox}>
-              <Text style={styles.joinIcon}>↗</Text>
+              <Icon name="arrow-up-right" size={22} color="#fff" strokeWidth={2.2} />
             </View>
             <Text style={styles.joinTitle}>Join with code</Text>
             <Text style={styles.joinSub}>Enter a 6-character invite code</Text>

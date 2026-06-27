@@ -6,6 +6,7 @@ import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
 import { initials } from '../../constants/helpers';
 import { FadeInUp, Pressable } from '../ui/anim';
+import Icon from '../ui/Icon';
 
 const ROLES = ['Lead Photographer', 'Photographer', 'Videographer', 'Editor'];
 
@@ -24,7 +25,7 @@ export default function CreateStudioScreen() {
           style={styles.backBtn}
           onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'onboard' })}
         >
-          <Text style={styles.backArrow}>‹</Text>
+          <Icon name="chevron-left" size={22} color={COLORS.textPrimary} />
         </TouchableOpacity>
 
         <FadeInUp index={0}>
@@ -51,12 +52,12 @@ export default function CreateStudioScreen() {
         <Text style={styles.label}>Your role</Text>
         <View style={styles.chips}>
           {ROLES.map(r => {
-            const on = state.studioRole === r;
+            const on = state.studioRole.includes(r);
             return (
               <TouchableOpacity
                 key={r}
                 style={[styles.chip, on && styles.chipActive]}
-                onPress={() => dispatch({ type: 'SET_STUDIO_ROLE', role: r })}
+                onPress={() => dispatch({ type: 'TOGGLE_STUDIO_ROLE', role: r })}
               >
                 <Text style={[styles.chipText, on && styles.chipTextActive]}>{r}</Text>
               </TouchableOpacity>

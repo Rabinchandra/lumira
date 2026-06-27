@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT } from '../../constants/colors';
+import Icon from './Icon';
 
 const MUTED = '#B3ABC8';
 
@@ -16,11 +17,11 @@ export default function BottomNav({ openNewSheet }: Props) {
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       <NavItem label="Home" active={tab === 'dashboard'} onPress={() => dispatch({ type: 'SET_TAB', tab: 'dashboard' })}>
-        {(color) => <Glyph glyph="⌂" color={color} />}
+        {(color) => <Glyph name="home" color={color} />}
       </NavItem>
 
       <NavItem label="Calendar" active={tab === 'calendar'} onPress={() => dispatch({ type: 'SET_TAB', tab: 'calendar' })}>
-        {(color) => <Glyph glyph="▦" color={color} />}
+        {(color) => <Glyph name="calendar" color={color} />}
       </NavItem>
 
       {/* FAB */}
@@ -29,11 +30,11 @@ export default function BottomNav({ openNewSheet }: Props) {
       </View>
 
       <NavItem label="Events" active={tab === 'events'} onPress={() => dispatch({ type: 'SET_TAB', tab: 'events' })}>
-        {(color) => <Glyph glyph="☰" color={color} />}
+        {(color) => <Glyph name="list" color={color} />}
       </NavItem>
 
       <NavItem label="Studio" active={tab === 'studio'} onPress={() => dispatch({ type: 'SET_TAB', tab: 'studio' })}>
-        {(color) => <Glyph glyph="◉" color={color} />}
+        {(color) => <Glyph name="studio" color={color} />}
       </NavItem>
     </View>
   );
@@ -98,16 +99,16 @@ function Fab({ onPress }: { onPress: () => void }) {
       onPressOut={() => Animated.spring(scale, { toValue: 1, speed: 40, bounciness: 12, useNativeDriver: true }).start()}
     >
       <Animated.View style={[styles.fab, { transform: [{ scale }, { rotate: spin }] }]}>
-        <Text style={styles.fabPlus}>+</Text>
+        <Icon name="plus" size={26} color="#fff" strokeWidth={2.6} />
       </Animated.View>
     </TouchableOpacity>
   );
 }
 
-function Glyph({ glyph, color }: { glyph: string; color: string }) {
+function Glyph({ name, color }: { name: React.ComponentProps<typeof Icon>['name']; color: string }) {
   return (
     <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontSize: 18, color }}>{glyph}</Text>
+      <Icon name={name} size={23} color={color} strokeWidth={2.1} />
     </View>
   );
 }
@@ -156,10 +157,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.45,
     shadowRadius: 20,
     elevation: 10,
-  },
-  fabPlus: {
-    fontSize: 28,
-    color: '#fff',
-    lineHeight: 32,
   },
 });

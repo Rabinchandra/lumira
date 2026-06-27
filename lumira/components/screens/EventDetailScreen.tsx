@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
@@ -9,10 +8,11 @@ import {
 } from '../../constants/helpers';
 import { SheetType } from './AppShell';
 import { FadeInUp, Pressable, AnimatedBar } from '../ui/anim';
+import Icon from '../ui/Icon';
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
-export default function EventDetailScreen({ openSheet }: Props) {
+export default function EventDetailScreen({ openSheet, showToast }: Props) {
   const { state, dispatch } = useApp();
   const insets = useSafeAreaInsets();
   const team = state.teams[state.teamId];
@@ -30,21 +30,21 @@ export default function EventDetailScreen({ openSheet }: Props) {
   else if (pend === 0) { payStatus = 'Fully paid'; payColor = COLORS.green; payBg = '#E2FAF3'; }
   else { payStatus = 'Partially paid'; payColor = COLORS.amber; payBg = '#FFF3DE'; }
 
-  const memberName = (id: string) => {
-    const m = team.members.find(x => x.id === id);
-    return m?.name || 'Crew';
+  const crewName = (a: { memberId: string; name?: string }) => {
+    const m = team.members.find(x => x.id === a.memberId);
+    return m?.name || a.name || 'Crew';
   };
-  const memberColor = (id: string) => {
-    const m = team.members.find(x => x.id === id);
-    return m?.color || '#9C95B4';
+  const crewColor = (a: { memberId: string; color?: string }) => {
+    const m = team.members.find(x => x.id === a.memberId);
+    return m?.color || a.color || '#9C95B4';
   };
+  const isExternal = (a: { memberId: string }) => !team.members.some(x => x.id === a.memberId);
 
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
         {/* Hero banner */}
-        <View style={styles.hero}>
-          <LinearGradient colors={T?.grad || [ACCENT.grad[0], ACCENT.grad[1]]} style={StyleSheet.absoluteFill} />
+        <View style={[styles.hero, { backgroundColor: T?.color || ACCENT.solid }]}>
           <View style={styles.heroDim} />
           {/* Top actions */}
           <View style={[styles.heroActions, { paddingTop: insets.top + 14 }]}>
@@ -52,13 +52,13 @@ export default function EventDetailScreen({ openSheet }: Props) {
               style={styles.heroBtn}
               onPress={() => dispatch({ type: 'OPEN_EVENT', id: null })}
             >
-              <Text style={styles.heroBtnText}>‹</Text>
+              <Icon name="chevron-left" size={24} color="#fff" strokeWidth={2.4} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.heroBtn}
               onPress={() => openSheet('delete')}
             >
-              <Text style={styles.heroBtnText}>{'×'}</Text>
+              <Icon name="close" size={22} color="#fff" strokeWidth={2.4} />
             </TouchableOpacity>
           </View>
           {/* Title at bottom */}
@@ -74,15 +74,15 @@ export default function EventDetailScreen({ openSheet }: Props) {
           {/* Meta info */}
           <FadeInUp index={1} style={styles.metaCard}>
             <View style={styles.metaRow}>
-              <Text style={styles.metaIcon}>{'▦'}</Text>
+              <View style={styles.metaIcon}><Icon name="calendar" size={19} color={COLORS.textSecondary} /></View>
               <Text style={styles.metaText}>{formatLong(ev.dateISO)}</Text>
             </View>
             <View style={[styles.metaRow, styles.metaBorder]}>
-              <Text style={styles.metaIcon}>{'◷'}</Text>
+              <View style={styles.metaIcon}><Icon name="clock" size={19} color={COLORS.textSecondary} /></View>
               <Text style={styles.metaText}>{ev.timeLabel}</Text>
             </View>
             <View style={[styles.metaRow, styles.metaLast]}>
-              <Text style={styles.metaIcon}>{'◉'}</Text>
+              <View style={styles.metaIcon}><Icon name="pin" size={19} color={COLORS.textSecondary} /></View>
               <Text style={styles.metaText}>{ev.venue}</Text>
             </View>
           </FadeInUp>
@@ -103,7 +103,7 @@ export default function EventDetailScreen({ openSheet }: Props) {
               scaleTo={0.9}
               style={styles.callBtn}
             >
-              <Text style={styles.callIcon}>{'☎︎'}</Text>
+              <Icon name="phone" size={20} color="#fff" />
             </Pressable>
           </FadeInUp>
 
@@ -130,21 +130,14 @@ export default function EventDetailScreen({ openSheet }: Props) {
               </View>
             </View>
             <View style={styles.progressBg}>
-              <AnimatedBar pct={paidPct} style={styles.progressFill}>
-                <LinearGradient
-                  colors={['#21D0A6', '#12C9A6']}
-                  style={{ flex: 1, borderRadius: 5 }}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                />
-              </AnimatedBar>
+              <AnimatedBar pct={paidPct} style={[styles.progressFill, { backgroundColor: COLORS.green }]} />
             </View>
 
             {/* Payment history */}
             {[...ev.payments].reverse().map((p, i) => (
               <View key={i} style={styles.payHistoryRow}>
                 <View style={styles.payHistoryIcon}>
-                  <Text style={{ fontSize: 12, color: COLORS.green }}>✓</Text>
+                  <Icon name="check" size={13} color={COLORS.green} strokeWidth={2.4} />
                 </View>
                 <View style={styles.payHistoryInfo}>
                   <Text style={styles.payHistoryNote}>{p.note}</Text>
@@ -165,22 +158,58 @@ export default function EventDetailScreen({ openSheet }: Props) {
 
           {/* Crew */}
           <FadeInUp index={4} style={styles.card}>
-            <Text style={[styles.cardTitle, { marginBottom: 14 }]}>Crew</Text>
-            {ev.assigned.map((a, i) => {
-              const name = memberName(a.memberId);
-              const color = memberColor(a.memberId);
-              return (
-                <View key={i} style={[styles.crewRow, i > 0 && { marginTop: 13 }]}>
-                  <View style={[styles.crewAvatar, { backgroundColor: color }]}>
-                    <Text style={styles.crewAvatarText}>{initials(name)}</Text>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Crew</Text>
+              <Pressable onPress={() => openSheet('crew')} scaleTo={0.92} style={styles.crewEditBtn}>
+                <Text style={styles.crewEditText}>Edit</Text>
+              </Pressable>
+            </View>
+            {ev.assigned.length === 0 ? (
+              <Text style={styles.crewEmpty}>No crew added yet. Tap Edit to add who's going.</Text>
+            ) : (
+              ev.assigned.map((a, i) => {
+                const name = crewName(a);
+                const color = crewColor(a);
+                return (
+                  <View key={i} style={[styles.crewRow, i > 0 && { marginTop: 13 }]}>
+                    <View style={[styles.crewAvatar, { backgroundColor: color }]}>
+                      <Text style={styles.crewAvatarText}>{initials(name)}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <View style={styles.crewNameRow}>
+                        <Text style={styles.crewName}>{name}</Text>
+                        {isExternal(a) && (
+                          <View style={styles.extTag}><Text style={styles.extTagText}>External</Text></View>
+                        )}
+                      </View>
+                      <Text style={styles.crewRole}>{a.role}</Text>
+                    </View>
+                    <Pressable
+                      onPress={() => {
+                        dispatch({
+                          type: 'UPDATE_EVENT_CREW',
+                          eventId: ev.id,
+                          assigned: ev.assigned.filter(x => x.memberId !== a.memberId),
+                        });
+                        showToast(`Removed ${name}`);
+                      }}
+                      scaleTo={0.85}
+                      style={styles.crewRemove}
+                    >
+                      <Icon name="close" size={15} color={COLORS.red} strokeWidth={2.2} />
+                    </Pressable>
                   </View>
-                  <View>
-                    <Text style={styles.crewName}>{name}</Text>
-                    <Text style={styles.crewRole}>{a.role}</Text>
-                  </View>
-                </View>
-              );
-            })}
+                );
+              })
+            )}
+
+            <Pressable
+              style={[styles.recordBtn, { backgroundColor: ACCENT.soft }]}
+              onPress={() => openSheet('crew')}
+            >
+              <Text style={{ fontSize: 16, color: ACCENT.ink }}>+</Text>
+              <Text style={[styles.recordBtnText, { color: ACCENT.ink }]}>Add or edit crew</Text>
+            </Pressable>
           </FadeInUp>
 
           {/* Notes */}
@@ -265,8 +294,19 @@ const styles = StyleSheet.create({
   crewRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   crewAvatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   crewAvatarText: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 14, color: '#fff' },
+  crewNameRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   crewName: { fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 14.5, color: COLORS.textPrimary },
+  extTag: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, backgroundColor: '#F2F0F8' },
+  extTagText: { fontFamily: 'DMSans_600SemiBold', fontSize: 10.5, color: COLORS.textSecondary },
   crewRole: { fontFamily: 'DMSans_400Regular', fontSize: 12.5, color: COLORS.textMuted },
+  crewEditBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 9, backgroundColor: ACCENT.soft },
+  crewEditText: { fontFamily: 'DMSans_600SemiBold', fontSize: 13, color: ACCENT.ink },
+  crewEmpty: { fontFamily: 'DMSans_400Regular', fontSize: 13.5, lineHeight: 20, color: COLORS.textMuted },
+  crewRemove: {
+    width: 30, height: 30, borderRadius: 10, backgroundColor: '#FFEDEA',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  crewRemoveText: { fontSize: 17, color: COLORS.red, lineHeight: 20 },
 
   notesText: { fontFamily: 'DMSans_400Regular', fontSize: 14, lineHeight: 22, color: '#5A5278' },
 });
