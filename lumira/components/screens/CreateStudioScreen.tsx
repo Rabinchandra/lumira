@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
 import { initials } from '../../constants/helpers';
+import { FadeInUp, Pressable } from '../ui/anim';
 
 const ROLES = ['Lead Photographer', 'Photographer', 'Videographer', 'Editor'];
 
@@ -26,10 +27,15 @@ export default function CreateStudioScreen() {
           <Text style={styles.backArrow}>‹</Text>
         </TouchableOpacity>
 
-        <Text style={styles.heading}>Create your studio</Text>
-        <Text style={styles.sub}>You'll be the owner and can invite your team next.</Text>
+        <FadeInUp index={0}>
+          <Text style={styles.heading}>Create your studio</Text>
+        </FadeInUp>
+        <FadeInUp index={1}>
+          <Text style={styles.sub}>You'll be the owner and can invite your team next.</Text>
+        </FadeInUp>
 
         {/* Studio name */}
+        <FadeInUp index={2}>
         <Text style={styles.label}>Studio name</Text>
         <TextInput
           style={styles.input}
@@ -38,8 +44,10 @@ export default function CreateStudioScreen() {
           value={state.studioName}
           onChangeText={name => dispatch({ type: 'SET_STUDIO_NAME', name })}
         />
+        </FadeInUp>
 
         {/* Role chips */}
+        <FadeInUp index={3}>
         <Text style={styles.label}>Your role</Text>
         <View style={styles.chips}>
           {ROLES.map(r => {
@@ -55,9 +63,10 @@ export default function CreateStudioScreen() {
             );
           })}
         </View>
+        </FadeInUp>
 
         {/* Preview card */}
-        <View style={styles.previewCard}>
+        <FadeInUp index={4} style={styles.previewCard}>
           <LinearGradient colors={ACCENT.grad} style={styles.previewAvatar}>
             <Text style={styles.previewAvatarText}>{previewInitials}</Text>
           </LinearGradient>
@@ -65,18 +74,19 @@ export default function CreateStudioScreen() {
             <Text style={styles.previewName}>{preview}</Text>
             <Text style={styles.previewRole}>Owner · Aanya Mehra</Text>
           </View>
-        </View>
+        </FadeInUp>
 
         {/* Create button */}
-        <TouchableOpacity
-          style={[styles.createBtnWrapper, styles.createBtn]}
-          onPress={() => {
-            dispatch({ type: 'SET_SCREEN', screen: 'app' });
-          }}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.createBtnText}>Create studio</Text>
-        </TouchableOpacity>
+        <FadeInUp index={5}>
+          <Pressable
+            style={[styles.createBtnWrapper, styles.createBtn]}
+            onPress={() => {
+              dispatch({ type: 'SET_SCREEN', screen: 'app' });
+            }}
+          >
+            <Text style={styles.createBtnText}>Create studio</Text>
+          </Pressable>
+        </FadeInUp>
       </ScrollView>
     </View>
   );

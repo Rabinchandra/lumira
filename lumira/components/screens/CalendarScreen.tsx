@@ -7,6 +7,7 @@ import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
 import { parseDate, toISO, monthLabel as getMonthLabel, formatMed, TODAY } from '../../constants/helpers';
 import { SheetType } from './AppShell';
 import { Event } from '../../constants/data';
+import { FadeInUp, Pressable } from '../ui/anim';
 
 const WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -60,7 +61,7 @@ export default function CalendarScreen({ openSheet }: Props) {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <FadeInUp index={0} style={styles.header}>
           <Text style={styles.monthTitle}>{label}</Text>
           <View style={styles.headerRight}>
             <TouchableOpacity
@@ -82,10 +83,10 @@ export default function CalendarScreen({ openSheet }: Props) {
               <Text style={styles.navBtnText}>›</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </FadeInUp>
 
         {/* Calendar grid */}
-        <View style={styles.calCard}>
+        <FadeInUp index={1} style={styles.calCard}>
           {/* Weekday headers */}
           <View style={styles.weekRow}>
             {WD.map((w, i) => (
@@ -130,22 +131,22 @@ export default function CalendarScreen({ openSheet }: Props) {
               ))}
             </View>
           ))}
-        </View>
+        </FadeInUp>
 
         {/* Selected day events */}
-        <View style={styles.selHeader}>
+        <FadeInUp index={2} style={styles.selHeader}>
           <Text style={styles.selTitle}>{selLabel}</Text>
           <Text style={styles.selCount}>
             {selEvs.length > 0 ? `${selEvs.length} event${selEvs.length > 1 ? 's' : ''}` : 'No events'}
           </Text>
-        </View>
+        </FadeInUp>
 
         {selEvs.length > 0 ? (
-          selEvs.map(ev => {
+          selEvs.map((ev, i) => {
             const T = EVENT_TYPES[ev.type];
             return (
-              <TouchableOpacity
-                key={ev.id}
+              <FadeInUp key={state.selectedDate + ev.id} delay={i * 70}>
+              <Pressable
                 style={styles.selEventCard}
                 onPress={() => dispatch({ type: 'OPEN_EVENT', id: ev.id })}
               >
@@ -164,14 +165,17 @@ export default function CalendarScreen({ openSheet }: Props) {
                   </View>
                 </View>
                 <Text style={styles.chevron}>›</Text>
-              </TouchableOpacity>
+              </Pressable>
+              </FadeInUp>
             );
           })
         ) : (
-          <TouchableOpacity style={styles.emptyDay} onPress={() => openSheet('new')}>
-            <Text style={styles.emptyText}>No events on this day</Text>
-            <Text style={[styles.addText, { color: ACCENT.ink }]}>+ Add an event</Text>
-          </TouchableOpacity>
+          <FadeInUp key={state.selectedDate}>
+            <Pressable style={styles.emptyDay} onPress={() => openSheet('new')}>
+              <Text style={styles.emptyText}>No events on this day</Text>
+              <Text style={[styles.addText, { color: ACCENT.ink }]}>+ Add an event</Text>
+            </Pressable>
+          </FadeInUp>
         )}
       </ScrollView>
     </View>

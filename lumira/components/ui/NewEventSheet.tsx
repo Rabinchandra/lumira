@@ -5,6 +5,7 @@ import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
 import { formatMed } from '../../constants/helpers';
 import { Event } from '../../constants/data';
+import { Pressable as AnimPressable } from './anim';
 
 type Props = { onClose: () => void; showToast: (m: string) => void };
 
@@ -89,9 +90,9 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
               </View>
             </View>
 
-            <TouchableOpacity onPress={handleSubmit} activeOpacity={0.85} style={[styles.createBtn, { marginTop: 20 }]}>
+            <AnimPressable onPress={handleSubmit} style={[styles.createBtn, { marginTop: 20 }]}>
               <Text style={styles.createBtnText}>Create event</Text>
-            </TouchableOpacity>
+            </AnimPressable>
           </ScrollView>
         </Pressable>
       </Pressable>

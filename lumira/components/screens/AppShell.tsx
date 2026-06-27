@@ -14,6 +14,7 @@ import NewEventSheet from '../ui/NewEventSheet';
 import DeleteSheet from '../ui/DeleteSheet';
 import CallingOverlay from '../ui/CallingOverlay';
 import Toast from '../ui/Toast';
+import { FadeInUp } from '../ui/anim';
 
 export type SheetType = 'team' | 'pay' | 'new' | 'delete' | 'call' | null;
 
@@ -49,10 +50,15 @@ export default function AppShell() {
 
   return (
     <View style={[styles.root, { paddingBottom: 0 }]}>
-      {inDetail
-        ? <EventDetailScreen openSheet={openSheet} showToast={showToast} />
-        : renderTab()
-      }
+      {inDetail ? (
+        <FadeInUp key="detail" distance={0} duration={340} style={{ flex: 1 }}>
+          <EventDetailScreen openSheet={openSheet} showToast={showToast} />
+        </FadeInUp>
+      ) : (
+        <FadeInUp key={state.tab} distance={10} duration={360} style={{ flex: 1 }}>
+          {renderTab()}
+        </FadeInUp>
+      )}
 
       {!inDetail && (
         <BottomNav openNewSheet={() => openSheet('new')} />

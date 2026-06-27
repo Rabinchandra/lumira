@@ -6,6 +6,7 @@ import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
 import { initials } from '../../constants/helpers';
 import { SheetType } from './AppShell';
+import { FadeInUp, Pressable } from '../ui/anim';
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
@@ -31,10 +32,12 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
         contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 14, paddingBottom: 100 }]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.heading}>Studio</Text>
+        <FadeInUp index={0}>
+          <Text style={styles.heading}>Studio</Text>
+        </FadeInUp>
 
         {/* User profile card */}
-        <View style={styles.profileCard}>
+        <FadeInUp index={1} style={styles.profileCard}>
           <LinearGradient colors={ACCENT.grad} style={styles.profileAvatar}>
             <Text style={styles.profileAvatarText}>AM</Text>
           </LinearGradient>
@@ -42,11 +45,13 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
             <Text style={styles.profileName}>Aanya Mehra</Text>
             <Text style={styles.profileEmail}>aanya@lumiere.co</Text>
           </View>
-        </View>
+        </FadeInUp>
 
         {/* Team members */}
-        <Text style={styles.sectionTitle}>{team.name}</Text>
-        <View style={styles.card}>
+        <FadeInUp index={2}>
+          <Text style={styles.sectionTitle}>{team.name}</Text>
+        </FadeInUp>
+        <FadeInUp index={3} style={styles.card}>
           {team.members.map((m, i) => (
             <View
               key={m.id}
@@ -66,10 +71,11 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
               )}
             </View>
           ))}
-        </View>
+        </FadeInUp>
 
         {/* Invite code (owner only) */}
         {isOwner && (
+          <FadeInUp index={4}>
           <LinearGradient colors={ACCENT.grad} style={styles.inviteCard}>
             <View style={styles.inviteBlob} />
             <View style={styles.inviteContent}>
@@ -80,16 +86,19 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
                   <Text style={styles.copyIcon}>⎘</Text>
                 </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.regenBtn} onPress={handleRegenCode}>
+              <Pressable style={styles.regenBtn} onPress={handleRegenCode}>
                 <Text style={styles.regenText}>↺  Generate new code</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </LinearGradient>
+          </FadeInUp>
         )}
 
         {/* Your studios */}
-        <Text style={styles.sectionTitle}>Your studios</Text>
-        <View style={styles.card}>
+        <FadeInUp index={5}>
+          <Text style={styles.sectionTitle}>Your studios</Text>
+        </FadeInUp>
+        <FadeInUp index={6} style={styles.card}>
           {Object.values(state.teams).map((t, i, arr) => {
             const active = t.id === state.teamId;
             return (
@@ -116,16 +125,18 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
               </TouchableOpacity>
             );
           })}
-        </View>
+        </FadeInUp>
 
         {/* Sign out */}
-        <TouchableOpacity
-          style={styles.signOutBtn}
-          onPress={() => dispatch({ type: 'SIGN_OUT' })}
-        >
-          <Text style={styles.signOutIcon}>→</Text>
-          <Text style={styles.signOutText}>Sign out</Text>
-        </TouchableOpacity>
+        <FadeInUp index={7}>
+          <Pressable
+            style={styles.signOutBtn}
+            onPress={() => dispatch({ type: 'SIGN_OUT' })}
+          >
+            <Text style={styles.signOutIcon}>→</Text>
+            <Text style={styles.signOutText}>Sign out</Text>
+          </Pressable>
+        </FadeInUp>
       </ScrollView>
     </View>
   );

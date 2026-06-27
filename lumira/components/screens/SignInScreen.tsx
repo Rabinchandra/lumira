@@ -1,14 +1,15 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { Text, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
-
-const { width } = Dimensions.get('window');
+import { FadeInUp, PopIn, Pressable, useFloat } from '../ui/anim';
 
 export default function SignInScreen() {
   const { dispatch } = useApp();
   const insets = useSafeAreaInsets();
+  const floatTR = useFloat(20, 3600);
+  const floatBL = useFloat(-22, 4200, 600);
 
   return (
     <LinearGradient
@@ -17,35 +18,40 @@ export default function SignInScreen() {
       start={{ x: 0.3, y: 0 }}
       end={{ x: 0.7, y: 1 }}
     >
-      {/* Background blobs */}
-      <View style={styles.blobTR} />
-      <View style={styles.blobBL} />
+      {/* Background blobs — gently floating */}
+      <Animated.View style={[styles.blobTR, { transform: [{ translateY: floatTR }] }]} />
+      <Animated.View style={[styles.blobBL, { transform: [{ translateY: floatBL }] }]} />
 
-      <View style={styles.content}>
+      <Animated.View style={styles.content}>
         {/* Logo */}
-        <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.logoBox}>
-          <Text style={styles.logoIcon}>✦</Text>
-        </LinearGradient>
+        <PopIn delay={120}>
+          <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.logoBox}>
+            <Text style={styles.logoIcon}>✦</Text>
+          </LinearGradient>
+        </PopIn>
 
-        <Text style={styles.appName}>Lumira</Text>
-        <Text style={styles.tagline}>
-          Run your photography studio — events, team & payments in one calm place.
-        </Text>
-      </View>
+        <FadeInUp delay={300}>
+          <Text style={styles.appName}>Lumira</Text>
+        </FadeInUp>
+        <FadeInUp delay={420}>
+          <Text style={styles.tagline}>
+            Run your photography studio — events, team & payments in one calm place.
+          </Text>
+        </FadeInUp>
+      </Animated.View>
 
-      <View style={styles.bottom}>
-        <TouchableOpacity
+      <FadeInUp delay={560} style={styles.bottom}>
+        <Pressable
           style={styles.googleBtn}
           onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'onboard' })}
-          activeOpacity={0.85}
         >
           <Text style={styles.googleIcon}>G</Text>
           <Text style={styles.googleText}>Continue with Google</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.legal}>
           By continuing you agree to our Terms{'\n'}and Privacy Policy.
         </Text>
-      </View>
+      </FadeInUp>
     </LinearGradient>
   );
 }

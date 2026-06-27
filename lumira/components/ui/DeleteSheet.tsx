@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Pressable } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, Modal } from 'react-native';
 import { useApp } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
+import { PopIn, Pressable } from './anim';
 
 type Props = { onClose: () => void; showToast: (m: string) => void };
 
@@ -20,23 +20,23 @@ export default function DeleteSheet({ onClose, showToast }: Props) {
   return (
     <Modal transparent animationType="fade" visible>
       <View style={styles.backdrop}>
-        <Pressable style={styles.card}>
-          <View style={styles.iconCircle}>
+        <PopIn from={0.85} style={styles.card}>
+          <PopIn delay={90} from={0.5} style={styles.iconCircle}>
             <Text style={styles.icon}>{'×'}</Text>
-          </View>
+          </PopIn>
           <Text style={styles.title}>Delete event?</Text>
           <Text style={styles.body}>
             This will permanently remove {ev?.title || 'this event'} and its payment history.
           </Text>
           <View style={styles.btns}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
+            <Pressable style={styles.cancelBtn} onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
+            </Pressable>
+            <Pressable style={styles.deleteBtn} onPress={handleDelete}>
               <Text style={styles.deleteText}>Delete</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
-        </Pressable>
+        </PopIn>
       </View>
     </Modal>
   );

@@ -10,6 +10,7 @@ import {
 } from '../../constants/helpers';
 import { SheetType } from './AppShell';
 import { Event } from '../../constants/data';
+import { FadeInUp, Pressable, AnimatedBar } from '../ui/anim';
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
@@ -66,7 +67,7 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <FadeInUp index={0} style={styles.header}>
           <TouchableOpacity style={styles.teamRow} onPress={() => openSheet('team')}>
             <View style={[styles.teamAvatar, { backgroundColor: team.color }]}>
               <Text style={styles.teamAvatarText}>{team.initials}</Text>
@@ -86,10 +87,10 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
               <Text style={styles.userAvatarText}>AM</Text>
             </LinearGradient>
           </TouchableOpacity>
-        </View>
+        </FadeInUp>
 
         {/* Month picker */}
-        <View style={styles.monthRow}>
+        <FadeInUp index={1} style={styles.monthRow}>
           <Text style={styles.monthSub}>Studio overview</Text>
           <View style={styles.monthPicker}>
             <TouchableOpacity
@@ -106,27 +107,29 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
               <Text style={styles.arrowText}>›</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </FadeInUp>
 
         {/* Hero revenue card */}
-        <LinearGradient colors={ACCENT.grad} style={styles.heroCard}>
-          <View style={styles.heroBlob} />
-          <Text style={styles.heroSub}>Collected this month</Text>
-          <View style={styles.heroAmtRow}>
-            <Text style={styles.heroAmt}>{formatINR(collected)}</Text>
-            <View style={styles.trendBadge}>
-              <Text style={styles.trendText}>↑ +18%</Text>
+        <FadeInUp index={2}>
+          <LinearGradient colors={ACCENT.grad} style={styles.heroCard}>
+            <View style={styles.heroBlob} />
+            <Text style={styles.heroSub}>Collected this month</Text>
+            <View style={styles.heroAmtRow}>
+              <Text style={styles.heroAmt}>{formatINR(collected)}</Text>
+              <View style={styles.trendBadge}>
+                <Text style={styles.trendText}>↑ +18%</Text>
+              </View>
             </View>
-          </View>
-          <Text style={styles.heroSubAmt}>of {formatINR(booked)} booked</Text>
-          <View style={styles.progressBg}>
-            <View style={[styles.progressFill, { width: `${collectedPct}%` }]} />
-          </View>
-        </LinearGradient>
+            <Text style={styles.heroSubAmt}>of {formatINR(booked)} booked</Text>
+            <View style={styles.progressBg}>
+              <AnimatedBar pct={collectedPct} style={styles.progressFill} />
+            </View>
+          </LinearGradient>
+        </FadeInUp>
 
         {/* Two tiles */}
-        <View style={styles.tilesRow}>
-          <TouchableOpacity
+        <FadeInUp index={3} style={styles.tilesRow}>
+          <Pressable
             style={styles.tile}
             onPress={() => dispatch({ type: 'SET_TAB', tab: 'events' })}
           >
@@ -135,8 +138,8 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
             </View>
             <Text style={styles.tileBig}>{formatINR(outstanding)}</Text>
             <Text style={styles.tileSub}>Outstanding · {dueEvs.length} dues</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             style={styles.tile}
             onPress={() => dispatch({ type: 'SET_TAB', tab: 'calendar' })}
           >
@@ -145,12 +148,12 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
             </View>
             <Text style={styles.tileBig}>{monthEvs.length} events</Text>
             <Text style={styles.tileSub}>{doneCount} done · {upCount} upcoming</Text>
-          </TouchableOpacity>
-        </View>
+          </Pressable>
+        </FadeInUp>
 
         {/* Category breakdown */}
         {cats.length > 0 && (
-          <View style={styles.card}>
+          <FadeInUp index={4} style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>By category</Text>
               <Text style={styles.cardMeta}>{formatINRShort(booked)} booked</Text>
@@ -183,23 +186,23 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
                 </View>
               ))}
             </View>
-          </View>
+          </FadeInUp>
         )}
 
         {/* Upcoming events */}
-        <View style={styles.sectionHeader}>
+        <FadeInUp index={5} style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Upcoming</Text>
           <TouchableOpacity onPress={() => dispatch({ type: 'SET_TAB', tab: 'calendar' })}>
             <Text style={[styles.sectionLink, { color: ACCENT.ink }]}>Calendar</Text>
           </TouchableOpacity>
-        </View>
-        {upcoming.map(ev => {
+        </FadeInUp>
+        {upcoming.map((ev, i) => {
           const T = EVENT_TYPES[ev.type];
           const d = parseDate(ev.dateISO);
           const pend = ev.total - getPaidAmount(ev.payments);
           return (
-            <TouchableOpacity
-              key={ev.id}
+            <FadeInUp key={ev.id} delay={420 + i * 80}>
+            <Pressable
               style={styles.eventCard}
               onPress={() => dispatch({ type: 'OPEN_EVENT', id: ev.id })}
             >
@@ -222,15 +225,18 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
                   {pend > 0 ? formatINRShort(pend) : 'Paid'}
                 </Text>
               </View>
-            </TouchableOpacity>
+            </Pressable>
+            </FadeInUp>
           );
         })}
 
         {/* Outstanding dues */}
         {dues.length > 0 && (
           <>
-            <Text style={[styles.sectionTitle, { marginTop: 24, marginBottom: 12 }]}>Outstanding dues</Text>
-            <View style={styles.card}>
+            <FadeInUp index={6}>
+              <Text style={[styles.sectionTitle, { marginTop: 24, marginBottom: 12 }]}>Outstanding dues</Text>
+            </FadeInUp>
+            <FadeInUp index={7} style={styles.card}>
               {dues.map(({ e, pend }, i) => {
                 const T = EVENT_TYPES[e.type];
                 return (
@@ -252,7 +258,7 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
                   </TouchableOpacity>
                 );
               })}
-            </View>
+            </FadeInUp>
           </>
         )}
       </ScrollView>

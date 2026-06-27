@@ -7,6 +7,7 @@ import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
 import { parseDate, getPaidAmount, formatINRShort, TODAY, MONTHS_SHORT } from '../../constants/helpers';
 import { SheetType } from './AppShell';
 import { Event } from '../../constants/data';
+import { FadeInUp, Pressable } from '../ui/anim';
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -33,10 +34,12 @@ export default function EventsListScreen({ }: Props) {
         contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 14, paddingBottom: 100 }]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.heading}>Events</Text>
+        <FadeInUp index={0}>
+          <Text style={styles.heading}>Events</Text>
+        </FadeInUp>
 
         {/* Filters */}
-        <View style={styles.filterRow}>
+        <FadeInUp index={1} style={styles.filterRow}>
           {FILTERS.map(f => {
             const on = state.filter === f.key;
             return (
@@ -49,10 +52,10 @@ export default function EventsListScreen({ }: Props) {
               </TouchableOpacity>
             );
           })}
-        </View>
+        </FadeInUp>
 
         {/* Events list */}
-        {list.map(ev => {
+        {list.map((ev, i) => {
           const T = EVENT_TYPES[ev.type];
           const d = parseDate(ev.dateISO);
           const paid = getPaidAmount(ev.payments);
@@ -63,8 +66,8 @@ export default function EventsListScreen({ }: Props) {
           else { sl = formatINRShort(pend) + ' due'; sc = COLORS.amber; sb = '#FFF3DE'; }
 
           return (
-            <TouchableOpacity
-              key={ev.id}
+            <FadeInUp key={ev.id} delay={140 + i * 55}>
+            <Pressable
               style={styles.eventCard}
               onPress={() => dispatch({ type: 'OPEN_EVENT', id: ev.id })}
             >
@@ -84,14 +87,15 @@ export default function EventsListScreen({ }: Props) {
               <View style={[styles.statusBadge, { backgroundColor: sb }]}>
                 <Text style={[styles.statusText, { color: sc }]}>{sl}</Text>
               </View>
-            </TouchableOpacity>
+            </Pressable>
+            </FadeInUp>
           );
         })}
 
         {list.length === 0 && (
-          <View style={styles.empty}>
+          <FadeInUp index={2} style={styles.empty}>
             <Text style={styles.emptyText}>No events found</Text>
-          </View>
+          </FadeInUp>
         )}
       </ScrollView>
     </View>

@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
+import { FadeInUp, Pressable as AnimPressable } from './anim';
 
 type Props = { onClose: () => void; showToast: (m: string) => void };
 
@@ -18,11 +19,11 @@ export default function TeamSheet({ onClose, showToast }: Props) {
           <View style={styles.handle} />
           <Text style={styles.title}>Switch studio</Text>
 
-          {Object.values(state.teams).map(t => {
+          {Object.values(state.teams).map((t, i) => {
             const active = t.id === state.teamId;
             return (
-              <TouchableOpacity
-                key={t.id}
+              <FadeInUp key={t.id} delay={60 + i * 60}>
+              <AnimPressable
                 style={[styles.teamRow, active && { backgroundColor: ACCENT.soft }]}
                 onPress={() => {
                   dispatch({ type: 'SET_TEAM', teamId: t.id });
@@ -42,16 +43,17 @@ export default function TeamSheet({ onClose, showToast }: Props) {
                     <Text style={styles.checkMark}>✓</Text>
                   </View>
                 )}
-              </TouchableOpacity>
+              </AnimPressable>
+              </FadeInUp>
             );
           })}
 
-          <TouchableOpacity style={styles.addRow} onPress={onClose}>
+          <AnimPressable style={styles.addRow} onPress={onClose}>
             <View style={[styles.addIcon, { backgroundColor: ACCENT.soft }]}>
               <Text style={[styles.addIconText, { color: ACCENT.ink }]}>+</Text>
             </View>
             <Text style={[styles.addText, { color: ACCENT.ink }]}>Create or join a studio</Text>
-          </TouchableOpacity>
+          </AnimPressable>
         </Pressable>
       </Pressable>
     </Modal>

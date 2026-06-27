@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
 import { formatINR, getPaidAmount } from '../../constants/helpers';
+import { Pressable as AnimPressable } from './anim';
 
 const METHODS = ['UPI', 'Cash', 'Bank transfer', 'Card'];
 
@@ -62,9 +63,9 @@ export default function PaymentSheet({ onClose, showToast }: Props) {
             })}
           </View>
 
-          <TouchableOpacity onPress={handleSubmit} activeOpacity={0.85} style={styles.saveBtn}>
+          <AnimPressable onPress={handleSubmit} style={styles.saveBtn}>
             <Text style={styles.saveBtnText}>Save payment</Text>
-          </TouchableOpacity>
+          </AnimPressable>
         </Pressable>
       </Pressable>
     </Modal>

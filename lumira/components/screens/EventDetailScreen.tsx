@@ -8,6 +8,7 @@ import {
   formatINR, getPaidAmount, formatLong, initials,
 } from '../../constants/helpers';
 import { SheetType } from './AppShell';
+import { FadeInUp, Pressable, AnimatedBar } from '../ui/anim';
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
@@ -61,17 +62,17 @@ export default function EventDetailScreen({ openSheet }: Props) {
             </TouchableOpacity>
           </View>
           {/* Title at bottom */}
-          <View style={styles.heroBottom}>
+          <FadeInUp delay={120} style={styles.heroBottom}>
             <View style={[styles.typeTag, { backgroundColor: 'rgba(255,255,255,0.25)' }]}>
               <Text style={styles.typeTagText}>{T?.label}</Text>
             </View>
             <Text style={styles.heroTitle}>{ev.title}</Text>
-          </View>
+          </FadeInUp>
         </View>
 
         <View style={styles.body}>
           {/* Meta info */}
-          <View style={styles.metaCard}>
+          <FadeInUp index={1} style={styles.metaCard}>
             <View style={styles.metaRow}>
               <Text style={styles.metaIcon}>{'▦'}</Text>
               <Text style={styles.metaText}>{formatLong(ev.dateISO)}</Text>
@@ -84,10 +85,10 @@ export default function EventDetailScreen({ openSheet }: Props) {
               <Text style={styles.metaIcon}>{'◉'}</Text>
               <Text style={styles.metaText}>{ev.venue}</Text>
             </View>
-          </View>
+          </FadeInUp>
 
           {/* Client */}
-          <View style={styles.clientCard}>
+          <FadeInUp index={2} style={styles.clientCard}>
             <View style={[styles.clientAvatar, { backgroundColor: T?.soft }]}>
               <Text style={[styles.clientAvatarText, { color: T?.color }]}>
                 {initials(ev.clientName)}
@@ -97,17 +98,17 @@ export default function EventDetailScreen({ openSheet }: Props) {
               <Text style={styles.clientName}>{ev.clientName}</Text>
               <Text style={styles.clientPhone}>{ev.clientPhone}</Text>
             </View>
-            <TouchableOpacity
+            <Pressable
               onPress={() => openSheet('call', { name: ev.clientName, phone: ev.clientPhone })}
-              activeOpacity={0.85}
+              scaleTo={0.9}
               style={styles.callBtn}
             >
               <Text style={styles.callIcon}>{'☎︎'}</Text>
-            </TouchableOpacity>
-          </View>
+            </Pressable>
+          </FadeInUp>
 
           {/* Payments */}
-          <View style={styles.card}>
+          <FadeInUp index={3} style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Payments</Text>
               <View style={[styles.payStatusBadge, { backgroundColor: payBg }]}>
@@ -129,12 +130,14 @@ export default function EventDetailScreen({ openSheet }: Props) {
               </View>
             </View>
             <View style={styles.progressBg}>
-              <LinearGradient
-                colors={['#21D0A6', '#12C9A6']}
-                style={[styles.progressFill, { width: `${paidPct}%` }]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              />
+              <AnimatedBar pct={paidPct} style={styles.progressFill}>
+                <LinearGradient
+                  colors={['#21D0A6', '#12C9A6']}
+                  style={{ flex: 1, borderRadius: 5 }}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                />
+              </AnimatedBar>
             </View>
 
             {/* Payment history */}
@@ -151,17 +154,17 @@ export default function EventDetailScreen({ openSheet }: Props) {
               </View>
             ))}
 
-            <TouchableOpacity
+            <Pressable
               style={[styles.recordBtn, { backgroundColor: ACCENT.soft }]}
               onPress={() => openSheet('pay')}
             >
               <Text style={{ fontSize: 16, color: ACCENT.ink }}>+</Text>
               <Text style={[styles.recordBtnText, { color: ACCENT.ink }]}>Record payment</Text>
-            </TouchableOpacity>
-          </View>
+            </Pressable>
+          </FadeInUp>
 
           {/* Crew */}
-          <View style={styles.card}>
+          <FadeInUp index={4} style={styles.card}>
             <Text style={[styles.cardTitle, { marginBottom: 14 }]}>Crew</Text>
             {ev.assigned.map((a, i) => {
               const name = memberName(a.memberId);
@@ -178,13 +181,13 @@ export default function EventDetailScreen({ openSheet }: Props) {
                 </View>
               );
             })}
-          </View>
+          </FadeInUp>
 
           {/* Notes */}
-          <View style={styles.card}>
+          <FadeInUp index={5} style={styles.card}>
             <Text style={[styles.cardTitle, { marginBottom: 8 }]}>Notes</Text>
             <Text style={styles.notesText}>{ev.notes}</Text>
-          </View>
+          </FadeInUp>
         </View>
       </ScrollView>
     </View>

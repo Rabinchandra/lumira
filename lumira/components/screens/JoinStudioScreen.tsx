@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
+import { FadeInUp, PopIn, Pressable } from '../ui/anim';
 
 export default function JoinStudioScreen() {
   const { state, dispatch } = useApp();
@@ -21,21 +22,32 @@ export default function JoinStudioScreen() {
       </TouchableOpacity>
 
       <View style={{ paddingHorizontal: 24 }}>
-        <Text style={styles.heading}>Join a studio</Text>
-        <Text style={styles.sub}>Ask the studio owner for the 6-character invite code.</Text>
+        <FadeInUp index={0}>
+          <Text style={styles.heading}>Join a studio</Text>
+        </FadeInUp>
+        <FadeInUp index={1}>
+          <Text style={styles.sub}>Ask the studio owner for the 6-character invite code.</Text>
+        </FadeInUp>
 
         {/* Code boxes */}
-        <View style={styles.codeRow}>
+        <FadeInUp index={2} style={styles.codeRow}>
           {[0, 1, 2, 3, 4, 5].map(i => (
             <View
               key={i}
               style={[styles.codeBox, code[i] ? { borderColor: ACCENT.solid } : {}]}
             >
-              <Text style={styles.codeChar}>{code[i] || ''}</Text>
+              {code[i] ? (
+                <PopIn key={code[i]} from={0.4}>
+                  <Text style={styles.codeChar}>{code[i]}</Text>
+                </PopIn>
+              ) : (
+                <Text style={styles.codeChar} />
+              )}
             </View>
           ))}
-        </View>
+        </FadeInUp>
 
+        <FadeInUp index={3}>
         <TextInput
           style={styles.codeInput}
           placeholder="Type code"
@@ -49,16 +61,17 @@ export default function JoinStudioScreen() {
         <Text style={styles.hint}>
           Try <Text style={{ color: COLORS.textSecondary, fontFamily: 'SpaceGrotesk_600SemiBold' }}>LUM4X9</Text> to preview a joined studio
         </Text>
+        </FadeInUp>
       </View>
 
       <View style={styles.bottom}>
-        <TouchableOpacity
+        <Pressable
+          disabled={!joinOk}
           onPress={() => {
             if (!joinOk) return;
             dispatch({ type: 'SET_SCREEN', screen: 'app' });
             dispatch({ type: 'SET_TEAM', teamId: 'A' });
           }}
-          activeOpacity={joinOk ? 0.85 : 1}
         >
           <LinearGradient
             colors={joinOk ? ACCENT.grad : ['#E6E3F0', '#E6E3F0']}
@@ -66,7 +79,7 @@ export default function JoinStudioScreen() {
           >
             <Text style={[styles.joinBtnText, !joinOk && { color: '#B3ABC8' }]}>Join studio</Text>
           </LinearGradient>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

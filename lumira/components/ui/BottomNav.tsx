@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT } from '../../constants/colors';
@@ -13,59 +13,103 @@ export default function BottomNav({ openNewSheet }: Props) {
   const insets = useSafeAreaInsets();
   const tab = state.tab;
 
-  const navColor = (t: string) => (tab === t ? ACCENT.solid : MUTED);
-
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-      {/* Home */}
-      <TouchableOpacity style={styles.navItem} onPress={() => dispatch({ type: 'SET_TAB', tab: 'dashboard' })}>
-        <HomeIcon color={navColor('dashboard')} />
-        <Text style={[styles.navLabel, { color: navColor('dashboard') }]}>Home</Text>
-      </TouchableOpacity>
+      <NavItem label="Home" active={tab === 'dashboard'} onPress={() => dispatch({ type: 'SET_TAB', tab: 'dashboard' })}>
+        {(color) => <Glyph glyph="⌂" color={color} />}
+      </NavItem>
 
-      {/* Calendar */}
-      <TouchableOpacity style={styles.navItem} onPress={() => dispatch({ type: 'SET_TAB', tab: 'calendar' })}>
-        <CalIcon color={navColor('calendar')} />
-        <Text style={[styles.navLabel, { color: navColor('calendar') }]}>Calendar</Text>
-      </TouchableOpacity>
+      <NavItem label="Calendar" active={tab === 'calendar'} onPress={() => dispatch({ type: 'SET_TAB', tab: 'calendar' })}>
+        {(color) => <Glyph glyph="▦" color={color} />}
+      </NavItem>
 
       {/* FAB */}
       <View style={styles.fabWrapper}>
-        <TouchableOpacity onPress={openNewSheet} activeOpacity={0.85} style={styles.fab}>
-          <Text style={styles.fabPlus}>+</Text>
-        </TouchableOpacity>
+        <Fab onPress={openNewSheet} />
       </View>
 
-      {/* Events */}
-      <TouchableOpacity style={styles.navItem} onPress={() => dispatch({ type: 'SET_TAB', tab: 'events' })}>
-        <ListIcon color={navColor('events')} />
-        <Text style={[styles.navLabel, { color: navColor('events') }]}>Events</Text>
-      </TouchableOpacity>
+      <NavItem label="Events" active={tab === 'events'} onPress={() => dispatch({ type: 'SET_TAB', tab: 'events' })}>
+        {(color) => <Glyph glyph="☰" color={color} />}
+      </NavItem>
 
-      {/* Studio */}
-      <TouchableOpacity style={styles.navItem} onPress={() => dispatch({ type: 'SET_TAB', tab: 'studio' })}>
-        <ProfileIcon color={navColor('studio')} />
-        <Text style={[styles.navLabel, { color: navColor('studio') }]}>Studio</Text>
-      </TouchableOpacity>
+      <NavItem label="Studio" active={tab === 'studio'} onPress={() => dispatch({ type: 'SET_TAB', tab: 'studio' })}>
+        {(color) => <Glyph glyph="◉" color={color} />}
+      </NavItem>
     </View>
   );
 }
 
-function HomeIcon({ color }: { color: string }) {
+function NavItem({
+  label,
+  active,
+  onPress,
+  children,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+  children: (color: string) => React.ReactNode;
+}) {
+  const progress = useRef(new Animated.Value(active ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.spring(progress, {
+      toValue: active ? 1 : 0,
+      friction: 6,
+      tension: 120,
+      useNativeDriver: true,
+    }).start();
+  }, [active]);
+
+  const color = active ? ACCENT.solid : MUTED;
+  const translateY = progress.interpolate({ inputRange: [0, 1], outputRange: [0, -3] });
+  const scale = progress.interpolate({ inputRange: [0, 1], outputRange: [1, 1.14] });
+
+  return (
+    <TouchableOpacity style={styles.navItem} onPress={onPress} activeOpacity={0.7}>
+      <Animated.View style={{ transform: [{ translateY }, { scale }] }}>
+        {children(color)}
+      </Animated.View>
+      <Text style={[styles.navLabel, { color }]}>{label}</Text>
+      <Animated.View style={[styles.activeDot, { opacity: progress, transform: [{ scale: progress }] }]} />
+    </TouchableOpacity>
+  );
+}
+
+function Fab({ onPress }: { onPress: () => void }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const rotate = useRef(new Animated.Value(0)).current;
+
+  const press = () => {
+    Animated.sequence([
+      Animated.timing(rotate, { toValue: 1, duration: 200, useNativeDriver: true }),
+      Animated.spring(rotate, { toValue: 0, friction: 5, tension: 90, useNativeDriver: true }),
+    ]).start();
+    onPress();
+  };
+
+  const spin = rotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '90deg'] });
+
+  return (
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={press}
+      onPressIn={() => Animated.spring(scale, { toValue: 0.9, speed: 50, bounciness: 0, useNativeDriver: true }).start()}
+      onPressOut={() => Animated.spring(scale, { toValue: 1, speed: 40, bounciness: 12, useNativeDriver: true }).start()}
+    >
+      <Animated.View style={[styles.fab, { transform: [{ scale }, { rotate: spin }] }]}>
+        <Text style={styles.fabPlus}>+</Text>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
+
+function Glyph({ glyph, color }: { glyph: string; color: string }) {
   return (
     <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontSize: 18, color }}>⌂</Text>
+      <Text style={{ fontSize: 18, color }}>{glyph}</Text>
     </View>
   );
-}
-function CalIcon({ color }: { color: string }) {
-  return <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18, color }}>{'▦'}</Text></View>;
-}
-function ListIcon({ color }: { color: string }) {
-  return <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18, color }}>{'☰'}</Text></View>;
-}
-function ProfileIcon({ color }: { color: string }) {
-  return <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18, color }}>{'◉'}</Text></View>;
 }
 
 const styles = StyleSheet.create({
@@ -86,6 +130,14 @@ const styles = StyleSheet.create({
   navLabel: {
     fontFamily: 'SpaceGrotesk_600SemiBold',
     fontSize: 10.5,
+  },
+  activeDot: {
+    position: 'absolute',
+    bottom: -3,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: ACCENT.solid,
   },
   fabWrapper: {
     flex: 1,

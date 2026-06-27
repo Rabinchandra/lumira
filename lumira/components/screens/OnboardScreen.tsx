@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
+import { FadeInUp, Pressable } from '../ui/anim';
 
 export default function OnboardScreen() {
   const { dispatch } = useApp();
@@ -12,7 +13,7 @@ export default function OnboardScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 30 }]}>
         {/* User avatar row */}
-        <View style={styles.userRow}>
+        <FadeInUp index={0} style={styles.userRow}>
           <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.avatar}>
             <Text style={styles.avatarText}>AM</Text>
           </LinearGradient>
@@ -20,37 +21,41 @@ export default function OnboardScreen() {
             <Text style={styles.signedInAs}>Signed in as</Text>
             <Text style={styles.userName}>Aanya Mehra</Text>
           </View>
-        </View>
+        </FadeInUp>
 
-        <Text style={styles.heading}>Let's get your{'\n'}studio set up</Text>
-        <Text style={styles.sub}>Create a new studio or join your team with an invite code.</Text>
+        <FadeInUp index={1}>
+          <Text style={styles.heading}>Let's get your{'\n'}studio set up</Text>
+        </FadeInUp>
+        <FadeInUp index={2}>
+          <Text style={styles.sub}>Create a new studio or join your team with an invite code.</Text>
+        </FadeInUp>
 
         {/* Create card */}
-        <TouchableOpacity
-          onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'create' })}
-          activeOpacity={0.85}
-        >
-          <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.createCard}>
-            <View style={styles.cardIconBox}>
-              <Text style={styles.cardIcon}>＋</Text>
-            </View>
-            <Text style={styles.cardTitle}>Create a studio</Text>
-            <Text style={styles.cardSub}>Start fresh and invite your team</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+        <FadeInUp index={3}>
+          <Pressable onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'create' })}>
+            <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.createCard}>
+              <View style={styles.cardIconBox}>
+                <Text style={styles.cardIcon}>＋</Text>
+              </View>
+              <Text style={styles.cardTitle}>Create a studio</Text>
+              <Text style={styles.cardSub}>Start fresh and invite your team</Text>
+            </LinearGradient>
+          </Pressable>
+        </FadeInUp>
 
         {/* Join card */}
-        <TouchableOpacity
-          style={styles.joinCard}
-          onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'join' })}
-          activeOpacity={0.85}
-        >
-          <View style={styles.joinIconBox}>
-            <Text style={styles.joinIcon}>↗</Text>
-          </View>
-          <Text style={styles.joinTitle}>Join with code</Text>
-          <Text style={styles.joinSub}>Enter a 6-character invite code</Text>
-        </TouchableOpacity>
+        <FadeInUp index={4}>
+          <Pressable
+            style={styles.joinCard}
+            onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'join' })}
+          >
+            <View style={styles.joinIconBox}>
+              <Text style={styles.joinIcon}>↗</Text>
+            </View>
+            <Text style={styles.joinTitle}>Join with code</Text>
+            <Text style={styles.joinSub}>Enter a 6-character invite code</Text>
+          </Pressable>
+        </FadeInUp>
       </ScrollView>
     </View>
   );
