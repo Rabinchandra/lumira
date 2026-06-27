@@ -18,7 +18,9 @@ export type IconName =
   | 'logout'
   | 'trash'
   | 'wallet'
-  | 'alert';
+  | 'alert'
+  | 'eye'
+  | 'eye-off';
 
 type Props = {
   name: IconName;
@@ -164,6 +166,22 @@ function paths(name: IconName, c: any, color: string) {
           <Path d="M12 3.5 22 19.5a1 1 0 0 1-.86 1.5H2.86A1 1 0 0 1 2 19.5L12 3.5Z" {...c} />
           <Line x1="12" y1="9" x2="12" y2="14" {...c} />
           <Circle cx="12" cy="17.3" r="1.2" fill={color} stroke="none" />
+        </>
+      );
+    case 'eye':
+      return (
+        <>
+          <Path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" {...c} />
+          <Circle cx="12" cy="12" r="3" {...c} />
+        </>
+      );
+    case 'eye-off':
+      return (
+        <>
+          <Path d="M9.9 5.8A8.7 8.7 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-3 3.6" {...c} />
+          <Path d="M6.3 7.8A15.7 15.7 0 0 0 2.5 12S6 18.5 12 18.5a8.6 8.6 0 0 0 3.9-.9" {...c} />
+          <Path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" {...c} />
+          <Line x1="4" y1="4" x2="20" y2="20" {...c} />
         </>
       );
     default:

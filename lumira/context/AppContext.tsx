@@ -3,7 +3,7 @@ import { EVENTS, TEAMS, Event, Team, Assignment } from '../constants/data';
 import { TODAY } from '../constants/helpers';
 import { supabase } from '../lib/supabase';
 
-type Screen = 'signin' | 'onboard' | 'create' | 'join' | 'app';
+type Screen = 'signin' | 'profile-setup' | 'onboard' | 'create' | 'join' | 'app';
 type Tab = 'dashboard' | 'calendar' | 'events' | 'studio';
 
 export type AppState = {
@@ -165,14 +165,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
+    function nextScreen(session: { user: { user_metadata?: Record<string, string> } } | null): Screen {
+      if (!session) return 'signin';
+      const meta = session.user.user_metadata ?? {};
+      return meta.display_name && meta.phone ? 'onboard' : 'profile-setup';
+    }
+
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) dispatch({ type: 'SET_SCREEN', screen: 'onboard' });
+      if (data.session) dispatch({ type: 'SET_SCREEN', screen: nextScreen(data.session) });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT' || !session) {
         dispatch({ type: 'SIGN_OUT' });
-      } else if (event === 'SIGNED_IN') {
-        dispatch({ type: 'SET_SCREEN', screen: 'onboard' });
+      } else if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        dispatch({ type: 'SET_SCREEN', screen: nextScreen(session) });
       }
     });
     return () => sub.subscription.unsubscribe();

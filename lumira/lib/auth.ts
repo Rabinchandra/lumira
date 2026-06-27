@@ -1,39 +1,36 @@
-import * as WebBrowser from 'expo-web-browser';
-import * as AuthSession from 'expo-auth-session';
-import * as QueryParams from 'expo-auth-session/build/QueryParams';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from './supabase';
 
-WebBrowser.maybeCompleteAuthSession();
-
-export async function signInWithGoogle() {
-  const redirectTo = AuthSession.makeRedirectUri({ scheme: 'lumira' });
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo, skipBrowserRedirect: true },
+export async function signUpWithPassword(email: string, password: string) {
+  const { data, error } = await supabase.auth.signUp({
+    email: email.trim(),
+    password,
   });
   if (error) throw error;
-  if (!data?.url) throw new Error('No OAuth URL returned by Supabase.');
+  return data;
+}
 
-  const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
-  if (result.type !== 'success' || !result.url) return null;
-
-  // Supabase returns tokens in the URL fragment for the implicit flow.
-  const { params, errorCode } = QueryParams.getQueryParams(result.url);
-  if (errorCode) throw new Error(errorCode);
-
-  const { access_token, refresh_token } = params;
-  if (!access_token) throw new Error('Missing access token in OAuth response.');
-
-  const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-    access_token,
-    refresh_token,
+export async function signInWithPassword(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email.trim(),
+    password,
   });
-  if (sessionError) throw sessionError;
-  return sessionData.session;
+  if (error) throw error;
+  return data;
 }
 
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
 }
+
+export async function clearAuthStorage() {
+  await supabase.auth.signOut({ scope: 'local' });
+  const keys = await AsyncStorage.getAllKeys();
+  const authKeys = keys.filter(
+    (k) => k.startsWith('sb-') || k.includes('supabase'),
+  );
+  if (authKeys.length) await AsyncStorage.multiRemove(authKeys);
+}
+
+clearAuthStorage();

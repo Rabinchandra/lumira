@@ -1,5 +1,6 @@
 import { useApp } from '../context/AppContext';
 import SignInScreen from '../components/screens/SignInScreen';
+import ProfileSetupScreen from '../components/screens/ProfileSetupScreen';
 import OnboardScreen from '../components/screens/OnboardScreen';
 import CreateStudioScreen from '../components/screens/CreateStudioScreen';
 import JoinStudioScreen from '../components/screens/JoinStudioScreen';
@@ -11,12 +12,13 @@ export default function Index() {
 
   const screen = (() => {
     switch (state.screen) {
-      case 'signin':   return <SignInScreen />;
-      case 'onboard':  return <OnboardScreen />;
-      case 'create':   return <CreateStudioScreen />;
-      case 'join':     return <JoinStudioScreen />;
-      case 'app':      return <AppShell />;
-      default:         return <SignInScreen />;
+      case 'signin':         return <SignInScreen />;
+      case 'profile-setup':  return <ProfileSetupScreen />;
+      case 'onboard':        return <OnboardScreen />;
+      case 'create':         return <CreateStudioScreen />;
+      case 'join':           return <JoinStudioScreen />;
+      case 'app':            return <AppShell />;
+      default:               return <SignInScreen />;
     }
   })();
 
