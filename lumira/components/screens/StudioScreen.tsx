@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
+import { supabase } from '../../lib/supabase';
 import { ACCENT, COLORS } from '../../constants/colors';
 import { initials } from '../../constants/helpers';
 import { SheetType } from './AppShell';
@@ -131,7 +132,10 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
         <FadeInUp index={7}>
           <Pressable
             style={styles.signOutBtn}
-            onPress={() => dispatch({ type: 'SIGN_OUT' })}
+            onPress={() => {
+              dispatch({ type: 'SIGN_OUT' });
+              supabase.auth.signOut();
+            }}
           >
             <Icon name="logout" size={18} color={COLORS.red} strokeWidth={2.1} />
             <Text style={styles.signOutText}>Sign out</Text>

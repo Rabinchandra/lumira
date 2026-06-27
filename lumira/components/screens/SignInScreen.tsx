@@ -1,13 +1,25 @@
-import React from 'react';
-import { Text, StyleSheet, Animated } from 'react-native';
+import React, { useState } from 'react';
+import { Text, StyleSheet, Animated, ActivityIndicator, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useApp } from '../../context/AppContext';
 import { FadeInUp, PopIn, Pressable, useFloat } from '../ui/anim';
+import { signInWithGoogle } from '../../lib/auth';
 
 export default function SignInScreen() {
-  const { dispatch } = useApp();
   const insets = useSafeAreaInsets();
+  const [loading, setLoading] = useState(false);
+
+  const onGoogle = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+    } catch (e: any) {
+      Alert.alert('Sign-in failed', e?.message ?? 'Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
   const floatTR = useFloat(20, 3600);
   const floatBL = useFloat(-22, 4200, 600);
 
@@ -41,12 +53,15 @@ export default function SignInScreen() {
       </Animated.View>
 
       <FadeInUp delay={560} style={styles.bottom}>
-        <Pressable
-          style={styles.googleBtn}
-          onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'onboard' })}
-        >
-          <Text style={styles.googleIcon}>G</Text>
-          <Text style={styles.googleText}>Continue with Google</Text>
+        <Pressable style={styles.googleBtn} onPress={onGoogle} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color="#1A1430" />
+          ) : (
+            <>
+              <Text style={styles.googleIcon}>G</Text>
+              <Text style={styles.googleText}>Continue with Google</Text>
+            </>
+          )}
         </Pressable>
         <Text style={styles.legal}>
           By continuing you agree to our Terms{'\n'}and Privacy Policy.
