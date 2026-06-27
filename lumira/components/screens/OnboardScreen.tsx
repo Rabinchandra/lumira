@@ -1,26 +1,34 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
+import { initials } from '../../constants/helpers';
 import { FadeInUp, Pressable } from '../ui/anim';
 import Icon from '../ui/Icon';
 
 export default function OnboardScreen() {
-  const { dispatch } = useApp();
+  const { state, dispatch } = useApp();
   const insets = useSafeAreaInsets();
+  const profile = state.profile;
+  const name = profile?.displayName || profile?.email || 'there';
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 30 }]}>
         {/* User avatar row */}
         <FadeInUp index={0} style={styles.userRow}>
-          <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.avatar}>
-            <Text style={styles.avatarText}>AM</Text>
-          </LinearGradient>
-          <View>
+          {profile?.photoUrl ? (
+            <Image source={{ uri: profile.photoUrl }} style={styles.avatar} />
+          ) : (
+            <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.avatar}>
+              <Text style={styles.avatarText}>{initials(name).toUpperCase() || '·'}</Text>
+            </LinearGradient>
+          )}
+          <View style={styles.userMeta}>
             <Text style={styles.signedInAs}>Signed in as</Text>
-            <Text style={styles.userName}>Aanya Mehra</Text>
+            <Text style={styles.userName}>{name}</Text>
+            {!!profile?.phone && <Text style={styles.userPhone}>{profile.phone}</Text>}
           </View>
         </FadeInUp>
 
@@ -81,14 +89,18 @@ const styles = StyleSheet.create({
   avatar: {
     width: 46,
     height: 46,
-    borderRadius: 14,
+    borderRadius: 23,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
   avatarText: {
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 18,
     color: '#fff',
+  },
+  userMeta: {
+    flex: 1,
   },
   signedInAs: {
     fontFamily: 'DMSans_400Regular',
@@ -99,6 +111,12 @@ const styles = StyleSheet.create({
     fontFamily: 'SpaceGrotesk_600SemiBold',
     fontSize: 17,
     color: '#fff',
+  },
+  userPhone: {
+    fontFamily: 'DMSans_400Regular',
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.55)',
+    marginTop: 2,
   },
   heading: {
     fontFamily: 'SpaceGrotesk_700Bold',

@@ -2,12 +2,14 @@ import React, { createContext, useContext, useEffect, useReducer } from 'react';
 import { EVENTS, TEAMS, Event, Team, Assignment } from '../constants/data';
 import { TODAY } from '../constants/helpers';
 import { supabase } from '../lib/supabase';
+import { Profile, profileFromUser } from '../lib/profile';
 
 type Screen = 'signin' | 'profile-setup' | 'onboard' | 'create' | 'join' | 'app';
 type Tab = 'dashboard' | 'calendar' | 'events' | 'studio';
 
 export type AppState = {
   screen: Screen;
+  profile: Profile | null;
   tab: Tab;
   teamId: string;
   monthOffset: number;
@@ -29,6 +31,7 @@ export type AppState = {
 
 type Action =
   | { type: 'SET_SCREEN'; screen: Screen }
+  | { type: 'SET_PROFILE'; profile: Profile | null }
   | { type: 'SET_TAB'; tab: Tab }
   | { type: 'SET_TEAM'; teamId: string }
   | { type: 'SET_MONTH_OFFSET'; offset: number }
@@ -52,6 +55,7 @@ type Action =
 
 const initialState: AppState = {
   screen: 'signin',
+  profile: null,
   tab: 'dashboard',
   teamId: 'A',
   monthOffset: 0,
@@ -75,6 +79,8 @@ function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case 'SET_SCREEN':
       return { ...state, screen: action.screen };
+    case 'SET_PROFILE':
+      return { ...state, profile: action.profile };
     case 'SET_TAB':
       return { ...state, tab: action.tab, openEventId: null };
     case 'SET_TEAM':
@@ -172,12 +178,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
 
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) dispatch({ type: 'SET_SCREEN', screen: nextScreen(data.session) });
+      if (data.session) {
+        dispatch({ type: 'SET_PROFILE', profile: profileFromUser(data.session.user) });
+        dispatch({ type: 'SET_SCREEN', screen: nextScreen(data.session) });
+      }
     });
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT' || !session) {
         dispatch({ type: 'SIGN_OUT' });
       } else if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        dispatch({ type: 'SET_PROFILE', profile: profileFromUser(session.user) });
         dispatch({ type: 'SET_SCREEN', screen: nextScreen(session) });
       }
     });

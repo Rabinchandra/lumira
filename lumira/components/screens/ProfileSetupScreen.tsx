@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import {
   Text,
+  View,
+  Image,
   StyleSheet,
   TextInput,
   KeyboardAvoidingView,
@@ -12,13 +14,32 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FadeInUp, PopIn, Pressable } from '../ui/anim';
+import Icon from '../ui/Icon';
 import { supabase } from '../../lib/supabase';
+import { pickAndUploadAvatar, saveProfile } from '../../lib/profile';
 
 export default function ProfileSetupScreen() {
   const insets = useSafeAreaInsets();
   const [displayName, setDisplayName] = useState('');
   const [phone, setPhone] = useState('');
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const onPickPhoto = async () => {
+    if (uploadingPhoto || loading) return;
+    setUploadingPhoto(true);
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data.user) throw error ?? new Error('Not signed in.');
+      const url = await pickAndUploadAvatar(data.user.id);
+      if (url) setPhotoUrl(url);
+    } catch (e: any) {
+      Alert.alert('Could not add photo', e?.message ?? 'Please try again.');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const onContinue = async () => {
     if (!displayName.trim()) {
@@ -31,10 +52,7 @@ export default function ProfileSetupScreen() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: { display_name: displayName.trim(), phone: phone.trim() },
-      });
-      if (error) throw error;
+      await saveProfile({ displayName: displayName.trim(), phone: phone.trim(), photoUrl });
       // USER_UPDATED event in AppContext will reroute to 'onboard'
     } catch (e: any) {
       Alert.alert('Could not save', e?.message ?? 'Please try again.');
@@ -72,6 +90,23 @@ export default function ProfileSetupScreen() {
           </FadeInUp>
 
           <FadeInUp delay={260} style={styles.form}>
+            <Pressable style={styles.avatarPicker} onPress={onPickPhoto} disabled={loading}>
+              {photoUrl ? (
+                <Image source={{ uri: photoUrl }} style={styles.avatar} />
+              ) : (
+                <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.avatar}>
+                  {uploadingPhoto ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Icon name="plus" size={26} color="#fff" strokeWidth={2.4} />
+                  )}
+                </LinearGradient>
+              )}
+              <Text style={styles.avatarHint}>
+                {uploadingPhoto ? 'Uploading…' : photoUrl ? 'Change photo' : 'Add a photo'}
+              </Text>
+            </Pressable>
+
             <Text style={styles.label}>Display name</Text>
             <TextInput
               style={styles.input}
@@ -162,6 +197,24 @@ const styles = StyleSheet.create({
   },
   form: {
     paddingBottom: 12,
+  },
+  avatarPicker: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  avatar: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  avatarHint: {
+    fontFamily: 'DMSans_500Medium',
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.6)',
+    marginTop: 10,
   },
   label: {
     fontFamily: 'DMSans_500Medium',
