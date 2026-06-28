@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert, RefreshControl } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { signOut } from '../../lib/auth';
@@ -11,6 +11,8 @@ import { FadeInUp, Pressable } from '../ui/anim';
 import Icon from '../ui/Icon';
 import { StudioSkeleton } from '../ui/Skeleton';
 import { api } from '../../lib/api';
+import { supabase } from '../../lib/supabase';
+import { pickAndUploadAvatar, saveProfile } from '../../lib/profile';
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
@@ -20,6 +22,7 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
   const team = state.teams[state.teamId];
   const [regenBusy, setRegenBusy] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try { await reloadTeams(); } finally { setRefreshing(false); }
@@ -45,6 +48,34 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
     }
   };
 
+  const handleChangePhoto = async () => {
+    if (uploadingPhoto || !profile) return;
+    setUploadingPhoto(true);
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data.user) throw error ?? new Error('Not signed in.');
+      const url = await pickAndUploadAvatar(data.user.id);
+      if (!url) return;
+      await api.upsertMyProfile({
+        display_name: profile.displayName,
+        phone: profile.phone,
+        avatar_url: url,
+      });
+      await saveProfile({ displayName: profile.displayName, phone: profile.phone, photoUrl: url });
+      dispatch({
+        type: 'SET_PROFILE',
+        profile: { ...profile, photoUrl: url },
+        userId: state.userId,
+      });
+      await reloadTeams();
+      showToast('Profile photo updated');
+    } catch (e: any) {
+      Alert.alert('Could not update photo', e?.message ?? 'Please try again.');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   const handleCopyCode = () => {
     showToast('Code copied to clipboard');
   };
@@ -62,16 +93,35 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
 
         {/* User profile card */}
         <FadeInUp index={1} style={styles.profileCard}>
-          {profile?.photoUrl ? (
-            <Image source={{ uri: profile.photoUrl }} style={styles.profileAvatar} />
-          ) : (
-            <View style={[styles.profileAvatar, { backgroundColor: ACCENT.solid }]}>
-              <Text style={styles.profileAvatarText}>{profileInitials}</Text>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={handleChangePhoto}
+            disabled={uploadingPhoto}
+            style={styles.avatarWrap}
+          >
+            {profile?.photoUrl ? (
+              <Image source={{ uri: profile.photoUrl }} style={styles.profileAvatar} />
+            ) : (
+              <View style={[styles.profileAvatar, { backgroundColor: ACCENT.solid }]}>
+                <Text style={styles.profileAvatarText}>{profileInitials}</Text>
+              </View>
+            )}
+            <View style={styles.avatarEditBadge}>
+              {uploadingPhoto ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Icon name="edit" size={12} color="#fff" strokeWidth={2.4} />
+              )}
             </View>
-          )}
-          <View>
+          </TouchableOpacity>
+          <View style={{ flex: 1 }}>
             <Text style={styles.profileName}>{profileName}</Text>
             <Text style={styles.profileEmail}>{profile?.email || ''}</Text>
+            <TouchableOpacity onPress={handleChangePhoto} disabled={uploadingPhoto}>
+              <Text style={styles.changePhotoLink}>
+                {uploadingPhoto ? 'Uploading…' : profile?.photoUrl ? 'Change photo' : 'Add a photo'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </FadeInUp>
 
@@ -185,10 +235,19 @@ const styles = StyleSheet.create({
     borderRadius: 22, padding: 18, flexDirection: 'row', alignItems: 'center',
     gap: 14, marginBottom: 22,
   },
+  avatarWrap: { position: 'relative' },
   profileAvatar: { width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   profileAvatarText: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 20, color: '#fff' },
+  avatarEditBadge: {
+    position: 'absolute', right: -2, bottom: -2,
+    width: 22, height: 22, borderRadius: 11,
+    backgroundColor: ACCENT.solid,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 2, borderColor: '#fff',
+  },
   profileName: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 18, color: COLORS.textPrimary },
   profileEmail: { fontFamily: 'DMSans_400Regular', fontSize: 13.5, color: COLORS.textMuted },
+  changePhotoLink: { fontFamily: 'DMSans_600SemiBold', fontSize: 12.5, color: ACCENT.ink, marginTop: 4 },
 
   sectionTitle: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 15, color: COLORS.textPrimary, marginBottom: 11 },
   card: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#F0EEF7', borderRadius: 20, overflow: 'hidden', marginBottom: 14 },
