@@ -55,7 +55,7 @@ export default function CrewSheet({ onClose, showToast }: Props) {
       {
         memberId: `ext-${Date.now()}-${prev.length}`,
         name,
-        role: extRole.trim() || 'Crew',
+        role: extRole.trim() || 'Other',
         color: EXT_COLORS[prev.length % EXT_COLORS.length],
       },
     ]);
@@ -101,7 +101,7 @@ export default function CrewSheet({ onClose, showToast }: Props) {
           <View style={styles.handle} />
           <ScrollView showsVerticalScrollIndicator={false}>
             <Text style={styles.title}>Edit crew</Text>
-            <Text style={styles.sub}>Tap to add or remove. Edit the role for anyone on the team.</Text>
+            <Text style={styles.sub}>Tap to add or remove. Set a role for anyone you include.</Text>
 
             <Text style={styles.sectionLabel}>Team</Text>
             <View style={styles.list}>
@@ -178,7 +178,7 @@ export default function CrewSheet({ onClose, showToast }: Props) {
               />
               <TextInput
                 style={styles.extInput}
-                placeholder="Role (optional)"
+                placeholder="Role (e.g. Photographer)"
                 placeholderTextColor={COLORS.textMuted}
                 value={extRole}
                 onChangeText={setExtRole}

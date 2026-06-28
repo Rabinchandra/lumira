@@ -2,11 +2,16 @@ import { Platform } from 'react-native';
 import { supabase } from './supabase';
 import type { Event, Team, Member, Assignment, PaymentRecord } from '../constants/data';
 
+export const isProduction = true;
+
+const PROD_URL = 'https://lumira-ntbg.onrender.com';
 // Android emulator can't reach the host's "localhost" — it must use 10.0.2.2.
 // For physical devices, set EXPO_PUBLIC_API_URL to your machine's LAN IP.
-const API_URL =
+const DEV_URL =
   process.env.EXPO_PUBLIC_API_URL ??
   (Platform.OS === 'android' ? 'http://10.0.2.2:4000' : 'http://localhost:4000');
+
+const API_URL = isProduction ? PROD_URL : DEV_URL;
 
 async function authHeaders(): Promise<Record<string, string>> {
   const { data } = await supabase.auth.getSession();
