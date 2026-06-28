@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
@@ -21,10 +21,14 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [localDate, setLocalDate] = useState(state.selectedDate);
   const [showCal, setShowCal] = useState(false);
-  const [startTime, setStartTime] = useState('10:00');
+  const [startHour, setStartHour] = useState('10');
+  const [startMin, setStartMin] = useState('00');
   const [startMeridiem, setStartMeridiem] = useState<'AM' | 'PM'>('AM');
-  const [endTime, setEndTime] = useState('2:00');
+  const [endHour, setEndHour] = useState('2');
+  const [endMin, setEndMin] = useState('00');
   const [endMeridiem, setEndMeridiem] = useState<'AM' | 'PM'>('PM');
+  const startMinRef = useRef<TextInput>(null);
+  const endMinRef = useRef<TextInput>(null);
   const [titleError, setTitleError] = useState(false);
   const [venue, setVenue] = useState('');
   const [clientName, setClientName] = useState('');
@@ -61,7 +65,7 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
     const t = state.newTitle.trim();
     if (!t) { setTitleError(true); return; }
     const total = parseInt(state.newTotal, 10) || 0;
-    const timeLabel = `${startTime.trim()} ${startMeridiem} – ${endTime.trim()} ${endMeridiem}`;
+    const timeLabel = `${startHour}:${startMin.padStart(2, '0')} ${startMeridiem} – ${endHour}:${endMin.padStart(2, '0')} ${endMeridiem}`;
     setSubmitting(true);
     try {
       const created = await api.createEvent({
@@ -163,47 +167,6 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
               </View>
             </View>
 
-            <View style={styles.row}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.label}>Start time</Text>
-                <View style={styles.timeRow}>
-                  <TextInput
-                    style={[styles.input, styles.timeInput]}
-                    placeholder="10:00"
-                    placeholderTextColor={COLORS.textMuted}
-                    value={startTime}
-                    onChangeText={setStartTime}
-                    keyboardType="numbers-and-punctuation"
-                  />
-                  <TouchableOpacity
-                    style={styles.meridiemBtn}
-                    onPress={() => setStartMeridiem(m => (m === 'AM' ? 'PM' : 'AM'))}
-                  >
-                    <Text style={styles.meridiemText}>{startMeridiem}</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.label}>End time</Text>
-                <View style={styles.timeRow}>
-                  <TextInput
-                    style={[styles.input, styles.timeInput]}
-                    placeholder="2:00"
-                    placeholderTextColor={COLORS.textMuted}
-                    value={endTime}
-                    onChangeText={setEndTime}
-                    keyboardType="numbers-and-punctuation"
-                  />
-                  <TouchableOpacity
-                    style={styles.meridiemBtn}
-                    onPress={() => setEndMeridiem(m => (m === 'AM' ? 'PM' : 'AM'))}
-                  >
-                    <Text style={styles.meridiemText}>{endMeridiem}</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-
             {showCal && (
               <View style={styles.calCard}>
                 <View style={styles.calHead}>
@@ -244,6 +207,83 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
                 ))}
               </View>
             )}
+
+            <View style={styles.row}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>Start time</Text>
+                <View style={styles.timeRow}>
+                  <TextInput
+                    style={[styles.input, styles.timeHalf]}
+                    placeholder="10"
+                    placeholderTextColor={COLORS.textMuted}
+                    value={startHour}
+                    onChangeText={v => {
+                      const clean = v.replace(/[^0-9]/g, '').slice(0, 2);
+                      setStartHour(clean);
+                      if (clean.length === 2) startMinRef.current?.focus();
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                    textAlign="center"
+                  />
+                  <Text style={styles.timeSep}>:</Text>
+                  <TextInput
+                    ref={startMinRef}
+                    style={[styles.input, styles.timeHalf]}
+                    placeholder="00"
+                    placeholderTextColor={COLORS.textMuted}
+                    value={startMin}
+                    onChangeText={v => setStartMin(v.replace(/[^0-9]/g, '').slice(0, 2))}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                    textAlign="center"
+                  />
+                  <TouchableOpacity
+                    style={styles.meridiemBtn}
+                    onPress={() => setStartMeridiem(m => (m === 'AM' ? 'PM' : 'AM'))}
+                  >
+                    <Text style={styles.meridiemText}>{startMeridiem}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>End time</Text>
+                <View style={styles.timeRow}>
+                  <TextInput
+                    style={[styles.input, styles.timeHalf]}
+                    placeholder="2"
+                    placeholderTextColor={COLORS.textMuted}
+                    value={endHour}
+                    onChangeText={v => {
+                      const clean = v.replace(/[^0-9]/g, '').slice(0, 2);
+                      setEndHour(clean);
+                      if (clean.length === 2) endMinRef.current?.focus();
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                    textAlign="center"
+                  />
+                  <Text style={styles.timeSep}>:</Text>
+                  <TextInput
+                    ref={endMinRef}
+                    style={[styles.input, styles.timeHalf]}
+                    placeholder="00"
+                    placeholderTextColor={COLORS.textMuted}
+                    value={endMin}
+                    onChangeText={v => setEndMin(v.replace(/[^0-9]/g, '').slice(0, 2))}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                    textAlign="center"
+                  />
+                  <TouchableOpacity
+                    style={styles.meridiemBtn}
+                    onPress={() => setEndMeridiem(m => (m === 'AM' ? 'PM' : 'AM'))}
+                  >
+                    <Text style={styles.meridiemText}>{endMeridiem}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
 
             <Text style={styles.label}>Venue <Text style={styles.optional}>Optional</Text></Text>
             <TextInput
@@ -356,8 +396,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
   },
   dateText: { fontFamily: 'DMSans_500Medium', fontSize: 14, color: COLORS.textPrimary },
-  timeRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16 },
-  timeInput: { flex: 1, marginBottom: 0, paddingHorizontal: 12 },
+  timeRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 16 },
+  timeHalf: { width: 46, marginBottom: 0, paddingHorizontal: 4 },
+  timeSep: { fontFamily: 'DMSans_700Bold', fontSize: 18, color: COLORS.textPrimary, marginBottom: 0 },
   meridiemBtn: {
     height: 50, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1.5,
     borderColor: '#E6E3F0', backgroundColor: '#F6F5FB',
