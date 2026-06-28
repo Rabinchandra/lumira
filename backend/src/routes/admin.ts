@@ -2,9 +2,10 @@ import { Router } from 'express';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { sql } from 'drizzle-orm';
 import { requireAdmin } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/error.js';
-import { pool } from '../db.js';
+import { db, pool } from '../db/index.js';
 import { runMigrations, migrationStatus } from '../migrate.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -22,15 +23,14 @@ router.post('/migrate', asyncHandler(async (_req, res) => {
 }));
 
 router.post('/seed', asyncHandler(async (req, res) => {
-  const name = (req.query.name ?? 'sample') + '.sql';
-  const sql = await fs.readFile(path.join(SEEDS_DIR, name), 'utf8');
-  await pool.query(sql);
+  const name = String(req.query.name ?? 'sample') + '.sql';
+  const text = await fs.readFile(path.join(SEEDS_DIR, name), 'utf8');
+  await pool.query(text);
   res.json({ seeded: name });
 }));
 
 router.post('/reset', asyncHandler(async (_req, res) => {
-  // Truncates app data but keeps schema and auth.users intact.
-  await pool.query(`
+  await db.execute(sql`
     truncate
       public.payments,
       public.assignments,
@@ -38,7 +38,7 @@ router.post('/reset', asyncHandler(async (_req, res) => {
       public.team_members,
       public.teams,
       public.profiles
-    restart identity cascade;
+    restart identity cascade
   `);
   res.json({ reset: true });
 }));

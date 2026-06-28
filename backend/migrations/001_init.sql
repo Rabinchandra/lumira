@@ -18,23 +18,34 @@ create table if not exists public.teams (
   id          uuid primary key default gen_random_uuid(),
   name        text not null,
   initials    text not null,
-  color       text not null,
   invite_code text not null unique,
   owner_id    uuid not null references public.profiles(id) on delete restrict,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
 
--- A user's membership in a team. role is a free-form label
--- (e.g. "Lead Photographer", "Editor"). is_owner mirrors teams.owner_id
--- for fast membership queries.
+-- Crew roles lookup (Photographer, Videographer, etc.).
+create table if not exists public.roles (
+  id   uuid primary key default gen_random_uuid(),
+  name text not null unique
+);
+
+insert into public.roles (name) values
+  ('Photographer'),
+  ('Videographer'),
+  ('Assistant'),
+  ('Editor'),
+  ('Drone Operator'),
+  ('Other')
+on conflict (name) do nothing;
+
+-- A user's membership in a team.
+-- Ownership is derived from teams.owner_id = team_members.user_id.
 create table if not exists public.team_members (
   id         uuid primary key default gen_random_uuid(),
   team_id    uuid not null references public.teams(id) on delete cascade,
   user_id    uuid not null references public.profiles(id) on delete cascade,
-  role       text not null,
-  color      text not null,
-  is_owner   boolean not null default false,
+  role_id    uuid not null references public.roles(id) on delete restrict,
   created_at timestamptz not null default now(),
   unique (team_id, user_id)
 );
@@ -63,14 +74,13 @@ create index if not exists events_date_idx on public.events(event_date);
 
 -- Crew assignment for an event.
 -- member_id is set when the crew is a team_member; for external crew
--- it stays null and external_name + color are filled instead.
+-- it stays null and external_name is filled instead.
 create table if not exists public.assignments (
   id            uuid primary key default gen_random_uuid(),
   event_id      uuid not null references public.events(id) on delete cascade,
   member_id     uuid references public.team_members(id) on delete set null,
-  role          text not null,
+  role_id       uuid not null references public.roles(id) on delete restrict,
   external_name text,
-  color         text,
   created_at    timestamptz not null default now(),
   check (member_id is not null or external_name is not null)
 );
