@@ -21,25 +21,34 @@ const DEV_URL =
 
 const API_URL = isProduction ? PROD_URL : DEV_URL;
 
-async function authHeaders(): Promise<Record<string, string>> {
+async function authHeaders(hasBody: boolean): Promise<Record<string, string>> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
   if (!token) throw new Error('Not signed in');
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
+  const h: Record<string, string> = { Authorization: `Bearer ${token}` };
+  if (hasBody) h['Content-Type'] = 'application/json';
+  return h;
 }
 
 async function http<T>(path: string, init?: RequestInit): Promise<T> {
-  const headers = await authHeaders();
+  const headers = await authHeaders(init?.body != null);
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: { ...headers, ...(init?.headers ?? {}) },
   });
   if (res.status === 204) return undefined as T;
   const text = await res.text();
-  const body = text ? JSON.parse(text) : null;
+  let body: any = null;
+  if (text) {
+    try {
+      body = JSON.parse(text);
+    } catch {
+      if (!res.ok) {
+        throw new Error(`Request failed (${res.status})`);
+      }
+      throw new Error(`Bad response from server (${res.status})`);
+    }
+  }
   if (!res.ok) {
     const msg = body?.error || `Request failed (${res.status})`;
     throw new Error(msg);

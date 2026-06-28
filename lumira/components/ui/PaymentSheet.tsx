@@ -7,7 +7,7 @@ import { formatINR, getPaidAmount, TODAY } from '../../constants/helpers';
 import { Pressable as AnimPressable } from './anim';
 import { api } from '../../lib/api';
 
-const METHODS = ['UPI', 'Cash', 'Bank transfer', 'Card'];
+const METHODS = ['UPI', 'Cash'];
 
 type Props = { onClose: () => void; showToast: (m: string) => void };
 

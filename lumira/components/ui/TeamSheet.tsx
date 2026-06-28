@@ -49,7 +49,13 @@ export default function TeamSheet({ onClose, showToast }: Props) {
             );
           })}
 
-          <AnimPressable style={styles.addRow} onPress={onClose}>
+          <AnimPressable
+            style={styles.addRow}
+            onPress={() => {
+              onClose();
+              dispatch({ type: 'SET_SCREEN', screen: 'onboard' });
+            }}
+          >
             <View style={[styles.addIcon, { backgroundColor: ACCENT.soft }]}>
               <Text style={[styles.addIconText, { color: ACCENT.ink }]}>+</Text>
             </View>

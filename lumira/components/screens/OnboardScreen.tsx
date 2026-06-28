@@ -12,10 +12,23 @@ export default function OnboardScreen() {
   const insets = useSafeAreaInsets();
   const profile = state.profile;
   const name = profile?.displayName || profile?.email || 'there';
+  const hasTeams = Object.keys(state.teams).length > 0;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 30 }]}>
+        {hasTeams && (
+          <FadeInUp index={0}>
+            <Pressable
+              style={styles.backBtn}
+              onPress={() => dispatch({ type: 'SET_SCREEN', screen: 'app' })}
+            >
+              <Icon name="chevron-left" size={20} color="#fff" strokeWidth={2.4} />
+              <Text style={styles.backText}>Back</Text>
+            </Pressable>
+          </FadeInUp>
+        )}
+
         {/* User avatar row */}
         <FadeInUp index={0} style={styles.userRow}>
           {profile?.photoUrl ? (
@@ -78,6 +91,20 @@ const styles = StyleSheet.create({
   scroll: {
     padding: 24,
     paddingTop: 8,
+  },
+  backBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    alignSelf: 'flex-start',
+    paddingVertical: 6,
+    paddingRight: 12,
+    marginBottom: 14,
+  },
+  backText: {
+    fontFamily: 'DMSans_500Medium',
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.85)',
   },
   userRow: {
     flexDirection: 'row',

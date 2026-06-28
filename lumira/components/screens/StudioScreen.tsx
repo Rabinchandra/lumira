@@ -38,8 +38,12 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
     if (regenBusy) return;
     setRegenBusy(true);
     try {
-      await api.regenerateCode(team.id);
-      await reloadTeams();
+      const updated = await api.regenerateCode(team.id);
+      const nextTeams = {
+        ...state.teams,
+        [team.id]: { ...state.teams[team.id], inviteCode: updated.invite_code },
+      };
+      dispatch({ type: 'SET_TEAMS', teams: nextTeams });
       showToast('New code generated');
     } catch (e: any) {
       showToast(e?.message || 'Could not regenerate');
@@ -166,8 +170,12 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
                   <Text style={styles.copyIcon}>⎘</Text>
                 </TouchableOpacity>
               </View>
-              <Pressable style={styles.regenBtn} onPress={handleRegenCode}>
-                <Text style={styles.regenText}>↺  Generate new code</Text>
+              <Pressable style={styles.regenBtn} onPress={handleRegenCode} disabled={regenBusy}>
+                {regenBusy ? (
+                  <ActivityIndicator size="small" color={ACCENT.ink} />
+                ) : (
+                  <Text style={styles.regenText}>↺  Generate new code</Text>
+                )}
               </Pressable>
             </View>
           </View>
