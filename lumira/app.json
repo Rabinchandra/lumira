@@ -4,7 +4,7 @@
     "slug": "lumira",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/lumira_logo.png",
     "userInterfaceStyle": "light",
     "scheme": "lumira",
     "ios": {

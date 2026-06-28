@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { supabase } from './supabase';
 import type { Event, Team, Member, Assignment, PaymentRecord } from '../constants/data';
 
-export const isProduction = true;
+export const isProduction = false;
 
 const PROD_URL = 'https://lumira-ntbg.onrender.com';
 // Android emulator can't reach the host's "localhost" — it must use 10.0.2.2.

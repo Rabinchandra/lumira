@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, Animated, ActivityIndicator, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import { Text, View, StyleSheet, Animated, ActivityIndicator, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FadeInUp, PopIn, Pressable, useFloat } from '../ui/anim';
@@ -68,9 +68,11 @@ export default function SignInScreen() {
         <Animated.View style={styles.content}>
           {/* Logo */}
           <PopIn delay={120}>
-            <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.logoBox}>
-              <Text style={styles.logoIcon}>✦</Text>
-            </LinearGradient>
+            <Image
+              source={require('../../assets/lumira_logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
           </PopIn>
 
           <FadeInUp delay={300}>
@@ -194,22 +196,11 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
   },
-  logoBox: {
-    width: 74,
-    height: 74,
+  logo: {
+    width: 80,
+    height: 80,
     borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 30,
-    shadowColor: '#7C5CFC',
-    shadowOffset: { width: 0, height: 14 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  logoIcon: {
-    color: '#fff',
-    fontSize: 36,
   },
   appName: {
     fontFamily: 'SpaceGrotesk_700Bold',

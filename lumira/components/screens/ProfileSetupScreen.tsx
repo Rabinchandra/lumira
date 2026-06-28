@@ -88,9 +88,11 @@ export default function ProfileSetupScreen() {
         >
           <FadeInUp delay={80} style={styles.top}>
             <PopIn delay={120}>
-              <LinearGradient colors={['#7C5CFC', '#C13FE8']} style={styles.logoBox}>
-                <Text style={styles.logoIcon}>✦</Text>
-              </LinearGradient>
+              <Image
+                source={require('../../assets/lumira_logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
             </PopIn>
             <Text style={styles.heading}>One last thing</Text>
             <Text style={styles.sub}>
@@ -172,22 +174,11 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 20,
   },
-  logoBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
+  logo: {
+    width: 70,
+    height: 70,
+    borderRadius: 20,
     marginBottom: 28,
-    shadowColor: '#7C5CFC',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.45,
-    shadowRadius: 18,
-    elevation: 8,
-  },
-  logoIcon: {
-    color: '#fff',
-    fontSize: 28,
   },
   heading: {
     fontFamily: 'SpaceGrotesk_700Bold',

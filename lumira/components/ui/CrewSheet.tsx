@@ -21,20 +21,24 @@ export default function CrewSheet({ onClose, showToast }: Props) {
   const members = state.teams[state.teamId]?.members || [];
   const ev = (state.events[state.teamId] || []).find(e => e.id === state.openEventId);
   const isMember = (id: string) => members.some(m => m.id === id);
+  const roleOptions = state.roles;
+  const defaultRoleName = roleOptions[0]?.name ?? 'Crew';
+
+  const stripOwner = (role: string) => role.replace(/^Owner\s*·\s*/, '');
 
   // Working copy of the team crew, keyed by memberId -> role.
   const [roles, setRoles] = useState<Record<string, string>>(() => {
     const init: Record<string, string> = {};
-    ev?.assigned.forEach(a => { if (isMember(a.memberId)) init[a.memberId] = a.role; });
+    ev?.assigned.forEach(a => { if (isMember(a.memberId)) init[a.memberId] = stripOwner(a.role); });
     return init;
   });
 
   // Working copy of external crew (people not on the team).
   const [externals, setExternals] = useState<Assignment[]>(
-    () => (ev?.assigned || []).filter(a => !isMember(a.memberId)),
+    () => (ev?.assigned || []).filter(a => !isMember(a.memberId)).map(a => ({ ...a, role: stripOwner(a.role) })),
   );
   const [extName, setExtName] = useState('');
-  const [extRole, setExtRole] = useState('');
+  const [extRole, setExtRole] = useState(defaultRoleName);
 
   if (!ev) return null;
 
@@ -55,12 +59,12 @@ export default function CrewSheet({ onClose, showToast }: Props) {
       {
         memberId: `ext-${Date.now()}-${prev.length}`,
         name,
-        role: extRole.trim() || 'Other',
+        role: extRole.trim() || defaultRoleName,
         color: EXT_COLORS[prev.length % EXT_COLORS.length],
       },
     ]);
     setExtName('');
-    setExtRole('');
+    setExtRole(defaultRoleName);
   };
 
   const handleSave = async () => {
@@ -81,6 +85,12 @@ export default function CrewSheet({ onClose, showToast }: Props) {
       const role_id = pickRoleId(roleName);
       if (role_id) list.push({ external_name: name, role_id });
     }
+    const expected =
+      Object.keys(roles).length + externals.filter(e => (e.name || '').trim()).length;
+    if (expected > 0 && list.length === 0) {
+      showToast('Could not resolve a role — try again');
+      return;
+    }
     setSaving(true);
     try {
       await api.setAssignments(ev.id, list);
@@ -88,6 +98,7 @@ export default function CrewSheet({ onClose, showToast }: Props) {
       showToast('Crew updated');
       onClose();
     } catch (err: any) {
+      console.error('setAssignments failed', err);
       showToast(err?.message || 'Could not save crew');
     } finally {
       setSaving(false);
@@ -112,7 +123,7 @@ export default function CrewSheet({ onClose, showToast }: Props) {
                     key={m.id}
                     style={[styles.row, on && { borderColor: ACCENT.solid, backgroundColor: ACCENT.soft }]}
                   >
-                    <TouchableOpacity style={styles.rowHead} onPress={() => toggle(m.id, m.role)}>
+                    <TouchableOpacity style={styles.rowHead} onPress={() => toggle(m.id, stripOwner(m.role))}>
                       <View style={[styles.avatar, { backgroundColor: m.color }]}>
                         {m.photoUrl
                           ? <Image source={{ uri: m.photoUrl }} style={styles.avatarImg} />
@@ -124,20 +135,27 @@ export default function CrewSheet({ onClose, showToast }: Props) {
                       </View>
                     </TouchableOpacity>
                     {on && (
-                      <TextInput
-                        style={styles.roleInput}
-                        placeholder="Role on this day"
-                        placeholderTextColor={COLORS.textMuted}
-                        value={roles[m.id]}
-                        onChangeText={v => setRoles(prev => ({ ...prev, [m.id]: v }))}
-                      />
+                      <View style={styles.roleChips}>
+                        {roleOptions.map(r => {
+                          const active = roles[m.id] === r.name;
+                          return (
+                            <TouchableOpacity
+                              key={r.id}
+                              style={[styles.roleChip, active && styles.roleChipActive]}
+                              onPress={() => setRoles(prev => ({ ...prev, [m.id]: r.name }))}
+                            >
+                              <Text style={[styles.roleChipText, active && styles.roleChipTextActive]}>{r.name}</Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
                     )}
                   </View>
                 );
               })}
             </View>
 
-            <Text style={styles.sectionLabel}>External crew</Text>
+            <Text style={[styles.sectionLabel, { marginTop: 20 }]}>External crew</Text>
             <Text style={styles.sectionHint}>Add freelancers or guests who aren't on your team.</Text>
 
             {externals.length > 0 && (
@@ -156,13 +174,20 @@ export default function CrewSheet({ onClose, showToast }: Props) {
                         <Icon name="close" size={15} color={COLORS.red} strokeWidth={2.2} />
                       </TouchableOpacity>
                     </View>
-                    <TextInput
-                      style={styles.roleInput}
-                      placeholder="Role on this day"
-                      placeholderTextColor={COLORS.textMuted}
-                      value={e.role}
-                      onChangeText={v => setExternals(prev => prev.map((x, i) => i === idx ? { ...x, role: v } : x))}
-                    />
+                    <View style={styles.roleChips}>
+                      {roleOptions.map(r => {
+                        const active = e.role === r.name;
+                        return (
+                          <TouchableOpacity
+                            key={r.id}
+                            style={[styles.roleChip, active && styles.roleChipActive]}
+                            onPress={() => setExternals(prev => prev.map((x, i) => i === idx ? { ...x, role: r.name } : x))}
+                          >
+                            <Text style={[styles.roleChipText, active && styles.roleChipTextActive]}>{r.name}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
                   </View>
                 ))}
               </View>
@@ -176,14 +201,20 @@ export default function CrewSheet({ onClose, showToast }: Props) {
                 value={extName}
                 onChangeText={setExtName}
               />
-              <TextInput
-                style={styles.extInput}
-                placeholder="Role (e.g. Photographer)"
-                placeholderTextColor={COLORS.textMuted}
-                value={extRole}
-                onChangeText={setExtRole}
-                onSubmitEditing={addExternal}
-              />
+              <View style={styles.roleChips}>
+                {roleOptions.map(r => {
+                  const active = extRole === r.name;
+                  return (
+                    <TouchableOpacity
+                      key={r.id}
+                      style={[styles.roleChip, active && styles.roleChipActive]}
+                      onPress={() => setExtRole(r.name)}
+                    >
+                      <Text style={[styles.roleChipText, active && styles.roleChipTextActive]}>{r.name}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
               <TouchableOpacity
                 style={[styles.addExtBtn, !extName.trim() && { opacity: 0.4 }]}
                 onPress={addExternal}
@@ -229,6 +260,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', paddingHorizontal: 13, fontFamily: 'DMSans_400Regular',
     fontSize: 14, color: COLORS.textPrimary,
   },
+  roleChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
+  roleChip: {
+    paddingHorizontal: 12, height: 32, borderRadius: 10, borderWidth: 1.5,
+    borderColor: '#E6E3F0', backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center',
+  },
+  roleChipActive: { borderColor: ACCENT.solid, backgroundColor: ACCENT.solid },
+  roleChipText: { fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 13, color: COLORS.textSecondary },
+  roleChipTextActive: { color: '#fff' },
   removeBtn: {
     width: 30, height: 30, borderRadius: 10, backgroundColor: '#FFEDEA',
     alignItems: 'center', justifyContent: 'center',
