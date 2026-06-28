@@ -7,6 +7,14 @@ import { asyncHandler, badRequest } from '../middleware/error.js';
 const router = Router();
 router.use(requireUser);
 
+const teamCols = {
+  id: schema.teams.id,
+  name: schema.teams.name,
+  initials: schema.teams.initials,
+  invite_code: schema.teams.inviteCode,
+  owner_id: schema.teams.ownerId,
+};
+
 function randomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
@@ -16,17 +24,17 @@ function randomCode(): string {
 
 router.get('/', asyncHandler(async (req, res) => {
   const rows = await db
-    .select({ team: schema.teams })
+    .select(teamCols)
     .from(schema.teams)
     .innerJoin(schema.teamMembers, eq(schema.teamMembers.teamId, schema.teams.id))
     .where(eq(schema.teamMembers.userId, req.user!.id))
     .orderBy(desc(schema.teams.createdAt));
-  res.json(rows.map((r) => r.team));
+  res.json(rows);
 }));
 
 router.get('/:id', asyncHandler(async (req, res) => {
   const { id } = req.params as { id: string };
-  const [row] = await db.select().from(schema.teams).where(eq(schema.teams.id, id));
+  const [row] = await db.select(teamCols).from(schema.teams).where(eq(schema.teams.id, id));
   if (!row) return res.status(404).json({ error: 'not found' });
   res.json(row);
 }));
@@ -41,7 +49,7 @@ router.post('/', asyncHandler(async (req, res) => {
     const [created] = await tx
       .insert(schema.teams)
       .values({ name, initials, inviteCode: randomCode(), ownerId: req.user!.id })
-      .returning();
+      .returning(teamCols);
     await tx.insert(schema.teamMembers).values({
       teamId: created.id,
       userId: req.user!.id,
@@ -63,7 +71,7 @@ router.patch('/:id', asyncHandler(async (req, res) => {
   if (name !== undefined) patch.name = name;
   if (initials !== undefined) patch.initials = initials;
 
-  const [row] = await db.update(schema.teams).set(patch).where(eq(schema.teams.id, id)).returning();
+  const [row] = await db.update(schema.teams).set(patch).where(eq(schema.teams.id, id)).returning(teamCols);
   res.json(row);
 }));
 
@@ -80,7 +88,7 @@ router.post('/:id/regenerate-code', asyncHandler(async (req, res) => {
     .update(schema.teams)
     .set({ inviteCode: randomCode(), updatedAt: new Date() })
     .where(eq(schema.teams.id, id))
-    .returning();
+    .returning(teamCols);
   res.json(row);
 }));
 
@@ -89,7 +97,7 @@ router.post('/join', asyncHandler(async (req, res) => {
   if (!invite_code || !role_id) throw badRequest('invite_code and role_id are required');
 
   const [team] = await db
-    .select()
+    .select(teamCols)
     .from(schema.teams)
     .where(eq(schema.teams.inviteCode, String(invite_code).trim().toUpperCase()));
   if (!team) return res.status(404).json({ error: 'invalid code' });

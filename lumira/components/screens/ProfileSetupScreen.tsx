@@ -17,9 +17,12 @@ import { FadeInUp, PopIn, Pressable } from '../ui/anim';
 import Icon from '../ui/Icon';
 import { supabase } from '../../lib/supabase';
 import { pickAndUploadAvatar, saveProfile } from '../../lib/profile';
+import { api } from '../../lib/api';
+import { useApp } from '../../context/AppContext';
 
 export default function ProfileSetupScreen() {
   const insets = useSafeAreaInsets();
+  const { dispatch } = useApp();
   const [displayName, setDisplayName] = useState('');
   const [phone, setPhone] = useState('');
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
@@ -52,8 +55,14 @@ export default function ProfileSetupScreen() {
     }
     setLoading(true);
     try {
+      // Persist to backend (source of truth) and mirror to auth metadata for convenience.
+      await api.upsertMyProfile({
+        display_name: displayName.trim(),
+        phone: phone.trim(),
+        avatar_url: photoUrl,
+      });
       await saveProfile({ displayName: displayName.trim(), phone: phone.trim(), photoUrl });
-      // USER_UPDATED event in AppContext will reroute to 'onboard'
+      dispatch({ type: 'SET_SCREEN', screen: 'onboard' });
     } catch (e: any) {
       Alert.alert('Could not save', e?.message ?? 'Please try again.');
       setLoading(false);

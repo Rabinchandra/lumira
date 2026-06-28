@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Pressable, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Pressable, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
@@ -7,6 +7,7 @@ import { initials } from '../../constants/helpers';
 import { Assignment } from '../../constants/data';
 import { Pressable as AnimPressable } from './anim';
 import Icon from './Icon';
+import { api } from '../../lib/api';
 
 type Props = { onClose: () => void; showToast: (m: string) => void };
 
@@ -14,8 +15,9 @@ type Props = { onClose: () => void; showToast: (m: string) => void };
 const EXT_COLORS = ['#FF6B5E', '#12C9A6', '#2E8BFF', '#F59E0B', '#FF4D8D', '#7C5CFC'];
 
 export default function CrewSheet({ onClose, showToast }: Props) {
-  const { state, dispatch } = useApp();
+  const { state, refreshEvent, pickRoleId } = useApp();
   const insets = useSafeAreaInsets();
+  const [saving, setSaving] = useState(false);
   const members = state.teams[state.teamId]?.members || [];
   const ev = (state.events[state.teamId] || []).find(e => e.id === state.openEventId);
   const isMember = (id: string) => members.some(m => m.id === id);
@@ -61,16 +63,35 @@ export default function CrewSheet({ onClose, showToast }: Props) {
     setExtRole('');
   };
 
-  const handleSave = () => {
-    const teamAssigned: Assignment[] = members
-      .filter(m => m.id in roles)
-      .map(m => ({ memberId: m.id, role: (roles[m.id] || '').trim() || 'Crew' }));
-    const extAssigned: Assignment[] = externals
-      .map(e => ({ ...e, name: (e.name || '').trim(), role: (e.role || '').trim() || 'Crew' }))
-      .filter(e => e.name);
-    dispatch({ type: 'UPDATE_EVENT_CREW', eventId: ev.id, assigned: [...teamAssigned, ...extAssigned] });
-    showToast('Crew updated');
-    onClose();
+  const handleSave = async () => {
+    if (saving) return;
+    if (!ev) return;
+    const list: Array<{ member_id?: string | null; role_id: string; external_name?: string | null }> = [];
+    for (const m of members) {
+      if (m.id in roles) {
+        const roleName = (roles[m.id] || '').trim() || 'Crew';
+        const role_id = pickRoleId(roleName);
+        if (role_id) list.push({ member_id: m.id, role_id });
+      }
+    }
+    for (const e of externals) {
+      const name = (e.name || '').trim();
+      if (!name) continue;
+      const roleName = (e.role || '').trim() || 'Crew';
+      const role_id = pickRoleId(roleName);
+      if (role_id) list.push({ external_name: name, role_id });
+    }
+    setSaving(true);
+    try {
+      await api.setAssignments(ev.id, list);
+      await refreshEvent(ev.id);
+      showToast('Crew updated');
+      onClose();
+    } catch (err: any) {
+      showToast(err?.message || 'Could not save crew');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -93,7 +114,9 @@ export default function CrewSheet({ onClose, showToast }: Props) {
                   >
                     <TouchableOpacity style={styles.rowHead} onPress={() => toggle(m.id, m.role)}>
                       <View style={[styles.avatar, { backgroundColor: m.color }]}>
-                        <Text style={styles.avatarText}>{initials(m.name)}</Text>
+                        {m.photoUrl
+                          ? <Image source={{ uri: m.photoUrl }} style={styles.avatarImg} />
+                          : <Text style={styles.avatarText}>{initials(m.name)}</Text>}
                       </View>
                       <Text style={styles.name}>{m.name}</Text>
                       <View style={[styles.checkbox, on && { backgroundColor: ACCENT.solid, borderColor: ACCENT.solid }]}>
@@ -171,8 +194,8 @@ export default function CrewSheet({ onClose, showToast }: Props) {
               </TouchableOpacity>
             </View>
 
-            <AnimPressable onPress={handleSave} style={styles.saveBtn}>
-              <Text style={styles.saveBtnText}>Save crew</Text>
+            <AnimPressable onPress={handleSave} disabled={saving} style={styles.saveBtn}>
+              {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Save crew</Text>}
             </AnimPressable>
           </ScrollView>
         </Pressable>
@@ -192,7 +215,8 @@ const styles = StyleSheet.create({
   list: { gap: 9 },
   row: { borderRadius: 14, borderWidth: 1.5, borderColor: '#E6E3F0', backgroundColor: '#fff', padding: 10 },
   rowHead: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  avatar: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  avatarImg: { width: 38, height: 38, borderRadius: 19 },
   avatarText: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 13, color: '#fff' },
   name: { flex: 1, fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 14.5, color: COLORS.textPrimary },
   checkbox: {

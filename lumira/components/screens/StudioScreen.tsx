@@ -1,26 +1,48 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
-import { supabase } from '../../lib/supabase';
+import { signOut } from '../../lib/auth';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ACCENT, COLORS } from '../../constants/colors';
 import { initials } from '../../constants/helpers';
 import { SheetType } from './AppShell';
 import { FadeInUp, Pressable } from '../ui/anim';
 import Icon from '../ui/Icon';
+import { StudioSkeleton } from '../ui/Skeleton';
+import { api } from '../../lib/api';
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
 export default function StudioScreen({ openSheet, showToast }: Props) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, reloadTeams } = useApp();
   const insets = useSafeAreaInsets();
   const team = state.teams[state.teamId];
+  const [regenBusy, setRegenBusy] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await reloadTeams(); } finally { setRefreshing(false); }
+  }, [reloadTeams]);
+  if (!team || state.loadingTeams) return <StudioSkeleton />;
   const isOwner = team.userRole === 'Owner';
-  const inviteCode = state.inviteCodes[state.teamId] || team.inviteCode;
+  const inviteCode = team.inviteCode;
+  const profile = state.profile;
+  const profileName = profile?.displayName || profile?.email || 'You';
+  const profileInitials = (initials(profileName) || profileName.slice(0, 2)).toUpperCase();
 
-  const handleRegenCode = () => {
-    dispatch({ type: 'REGEN_CODE', teamId: state.teamId });
-    showToast('New code generated');
+  const handleRegenCode = async () => {
+    if (regenBusy) return;
+    setRegenBusy(true);
+    try {
+      await api.regenerateCode(team.id);
+      await reloadTeams();
+      showToast('New code generated');
+    } catch (e: any) {
+      showToast(e?.message || 'Could not regenerate');
+    } finally {
+      setRegenBusy(false);
+    }
   };
 
   const handleCopyCode = () => {
@@ -32,6 +54,7 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 14, paddingBottom: 100 }]}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7C5CFC" />}
       >
         <FadeInUp index={0}>
           <Text style={styles.heading}>Studio</Text>
@@ -39,12 +62,16 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
 
         {/* User profile card */}
         <FadeInUp index={1} style={styles.profileCard}>
-          <View style={[styles.profileAvatar, { backgroundColor: ACCENT.solid }]}>
-            <Text style={styles.profileAvatarText}>AM</Text>
-          </View>
+          {profile?.photoUrl ? (
+            <Image source={{ uri: profile.photoUrl }} style={styles.profileAvatar} />
+          ) : (
+            <View style={[styles.profileAvatar, { backgroundColor: ACCENT.solid }]}>
+              <Text style={styles.profileAvatarText}>{profileInitials}</Text>
+            </View>
+          )}
           <View>
-            <Text style={styles.profileName}>Aanya Mehra</Text>
-            <Text style={styles.profileEmail}>aanya@lumiere.co</Text>
+            <Text style={styles.profileName}>{profileName}</Text>
+            <Text style={styles.profileEmail}>{profile?.email || ''}</Text>
           </View>
         </FadeInUp>
 
@@ -58,8 +85,10 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
               key={m.id}
               style={[styles.memberRow, i < team.members.length - 1 && styles.memberBorder]}
             >
-              <View style={[styles.memberAvatar, { backgroundColor: m.color }]}>
-                <Text style={styles.memberAvatarText}>{initials(m.name)}</Text>
+              <View style={[styles.memberAvatar, { backgroundColor: m.color, overflow: 'hidden' }]}>
+                {m.photoUrl
+                  ? <Image source={{ uri: m.photoUrl }} style={styles.memberAvatarImg} />
+                  : <Text style={styles.memberAvatarText}>{initials(m.name)}</Text>}
               </View>
               <View style={styles.memberInfo}>
                 <Text style={styles.memberName}>{m.name}</Text>
@@ -132,9 +161,9 @@ export default function StudioScreen({ openSheet, showToast }: Props) {
         <FadeInUp index={7}>
           <Pressable
             style={styles.signOutBtn}
-            onPress={() => {
+            onPress={async () => {
+              try { await signOut(); } catch (e: any) { Alert.alert('Sign out failed', e?.message ?? ''); }
               dispatch({ type: 'SIGN_OUT' });
-              supabase.auth.signOut();
             }}
           >
             <Icon name="logout" size={18} color={COLORS.red} strokeWidth={2.1} />
@@ -167,6 +196,7 @@ const styles = StyleSheet.create({
   memberRow: { flexDirection: 'row', alignItems: 'center', gap: 13, padding: 13, paddingHorizontal: 16 },
   memberBorder: { borderBottomWidth: 1, borderBottomColor: '#F2F0F8' },
   memberAvatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  memberAvatarImg: { width: 40, height: 40, borderRadius: 20 },
   memberAvatarText: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 14, color: '#fff' },
   memberInfo: { flex: 1 },
   memberName: { fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 14.5, color: COLORS.textPrimary },

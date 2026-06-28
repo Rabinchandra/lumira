@@ -32,5 +32,3 @@ export async function clearAuthStorage() {
   );
   if (authKeys.length) await AsyncStorage.multiRemove(authKeys);
 }
-
-clearAuthStorage();

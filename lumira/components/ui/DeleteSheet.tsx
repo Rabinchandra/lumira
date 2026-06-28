@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, Text, StyleSheet, Modal } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Modal, ActivityIndicator } from 'react-native';
 import { useApp } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
 import { PopIn, Pressable } from './anim';
 import Icon from './Icon';
+import { api } from '../../lib/api';
 
 type Props = { onClose: () => void; showToast: (m: string) => void };
 
@@ -11,11 +12,22 @@ export default function DeleteSheet({ onClose, showToast }: Props) {
   const { state, dispatch } = useApp();
   const ev = (state.events[state.teamId] || []).find(e => e.id === state.openEventId);
 
-  const handleDelete = () => {
+  const [busy, setBusy] = useState(false);
+  const handleDelete = async () => {
+    if (busy) return;
     if (!state.openEventId) return;
-    dispatch({ type: 'DELETE_EVENT', eventId: state.openEventId });
-    showToast('Event deleted');
-    onClose();
+    const eventId = state.openEventId;
+    setBusy(true);
+    try {
+      await api.deleteEvent(eventId);
+      dispatch({ type: 'REMOVE_EVENT', teamId: state.teamId, eventId });
+      showToast('Event deleted');
+      onClose();
+    } catch (e: any) {
+      showToast(e?.message || 'Could not delete');
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -33,8 +45,8 @@ export default function DeleteSheet({ onClose, showToast }: Props) {
             <Pressable style={styles.cancelBtn} onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
             </Pressable>
-            <Pressable style={styles.deleteBtn} onPress={handleDelete}>
-              <Text style={styles.deleteText}>Delete</Text>
+            <Pressable style={styles.deleteBtn} onPress={handleDelete} disabled={busy}>
+              {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.deleteText}>Delete</Text>}
             </Pressable>
           </View>
         </PopIn>

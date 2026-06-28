@@ -1,28 +1,46 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Pressable, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
-import { formatINR, getPaidAmount } from '../../constants/helpers';
+import { formatINR, getPaidAmount, TODAY } from '../../constants/helpers';
 import { Pressable as AnimPressable } from './anim';
+import { api } from '../../lib/api';
 
 const METHODS = ['UPI', 'Cash', 'Bank transfer', 'Card'];
 
 type Props = { onClose: () => void; showToast: (m: string) => void };
 
 export default function PaymentSheet({ onClose, showToast }: Props) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, refreshEvent } = useApp();
   const insets = useSafeAreaInsets();
+  const [submitting, setSubmitting] = useState(false);
 
   const ev = (state.events[state.teamId] || []).find(e => e.id === state.openEventId);
   const pend = ev ? ev.total - getPaidAmount(ev.payments) : 0;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (submitting) return;
     const amt = parseInt(state.payAmount, 10);
     if (!amt || amt <= 0) { showToast('Enter an amount'); return; }
-    dispatch({ type: 'ADD_PAYMENT', eventId: state.openEventId!, amount: amt, method: state.payMethod });
-    showToast(`Payment of ${formatINR(amt)} recorded`);
-    onClose();
+    if (!state.openEventId) return;
+    setSubmitting(true);
+    try {
+      await api.addPayment(state.openEventId, {
+        paid_on: TODAY,
+        amount: amt,
+        method: state.payMethod,
+        note: 'Payment received',
+      });
+      await refreshEvent(state.openEventId);
+      dispatch({ type: 'SET_PAY_AMOUNT', amount: '' });
+      showToast(`Payment of ${formatINR(amt)} recorded`);
+      onClose();
+    } catch (e: any) {
+      showToast(e?.message || 'Could not record payment');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -63,8 +81,10 @@ export default function PaymentSheet({ onClose, showToast }: Props) {
             })}
           </View>
 
-          <AnimPressable onPress={handleSubmit} style={styles.saveBtn}>
-            <Text style={styles.saveBtnText}>Save payment</Text>
+          <AnimPressable onPress={handleSubmit} disabled={submitting} style={styles.saveBtn}>
+            {submitting
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={styles.saveBtnText}>Save payment</Text>}
           </AnimPressable>
         </Pressable>
       </Pressable>

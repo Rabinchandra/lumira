@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
@@ -7,12 +7,14 @@ import { ACCENT, COLORS } from '../../constants/colors';
 import { initials } from '../../constants/helpers';
 import { FadeInUp, Pressable } from '../ui/anim';
 import Icon from '../ui/Icon';
-
-const ROLES = ['Lead Photographer', 'Photographer', 'Videographer', 'Editor'];
+import { api } from '../../lib/api';
 
 export default function CreateStudioScreen() {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, reloadTeams, pickRoleId } = useApp();
   const insets = useSafeAreaInsets();
+  const [submitting, setSubmitting] = useState(false);
+  // Display role labels. Backend roles seeded: Photographer, Videographer, Editor, etc.
+  const ROLES = state.roles.length ? state.roles.map(r => r.name) : ['Photographer', 'Videographer', 'Editor'];
 
   const preview = state.studioName || 'Your studio';
   const previewInitials = initials(state.studioName || 'Your Studio') || 'YS';
@@ -81,11 +83,33 @@ export default function CreateStudioScreen() {
         <FadeInUp index={5}>
           <Pressable
             style={[styles.createBtnWrapper, styles.createBtn]}
-            onPress={() => {
-              dispatch({ type: 'SET_SCREEN', screen: 'app' });
+            disabled={submitting}
+            onPress={async () => {
+              const name = state.studioName.trim();
+              if (!name) { Alert.alert('Studio name required'); return; }
+              const roleName = state.studioRole[0];
+              const roleId = pickRoleId(roleName);
+              if (!roleId) { Alert.alert('Roles not loaded', 'Try again in a moment.'); return; }
+              setSubmitting(true);
+              try {
+                const team = await api.createTeam({
+                  name,
+                  initials: (initials(name) || name.slice(0, 2)).toUpperCase(),
+                  role_id: roleId,
+                });
+                const teams = await reloadTeams();
+                if (teams[team.id]) dispatch({ type: 'SET_TEAM', teamId: team.id });
+                dispatch({ type: 'SET_SCREEN', screen: 'app' });
+              } catch (e: any) {
+                Alert.alert('Could not create', e?.message ?? 'Please try again.');
+              } finally {
+                setSubmitting(false);
+              }
             }}
           >
-            <Text style={styles.createBtnText}>Create studio</Text>
+            {submitting
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={styles.createBtnText}>Create studio</Text>}
           </Pressable>
         </FadeInUp>
       </ScrollView>

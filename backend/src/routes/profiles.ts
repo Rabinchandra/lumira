@@ -7,8 +7,15 @@ import { asyncHandler, badRequest } from '../middleware/error.js';
 const router = Router();
 router.use(requireUser);
 
+const profileCols = {
+  id: schema.profiles.id,
+  display_name: schema.profiles.displayName,
+  phone: schema.profiles.phone,
+  avatar_url: schema.profiles.avatarUrl,
+};
+
 router.get('/me', asyncHandler(async (req, res) => {
-  const [row] = await db.select().from(schema.profiles).where(eq(schema.profiles.id, req.user!.id));
+  const [row] = await db.select(profileCols).from(schema.profiles).where(eq(schema.profiles.id, req.user!.id));
   res.json(row ?? null);
 }));
 
@@ -16,7 +23,7 @@ router.put('/me', asyncHandler(async (req, res) => {
   const { display_name, phone, avatar_url } = req.body ?? {};
   if (!display_name) throw badRequest('display_name is required');
 
-  const [row] = await db
+  await db
     .insert(schema.profiles)
     .values({
       id: req.user!.id,
@@ -32,14 +39,14 @@ router.put('/me', asyncHandler(async (req, res) => {
         avatarUrl: avatar_url ?? null,
         updatedAt: new Date(),
       },
-    })
-    .returning();
+    });
+  const [row] = await db.select(profileCols).from(schema.profiles).where(eq(schema.profiles.id, req.user!.id));
   res.json(row);
 }));
 
 router.get('/:id', asyncHandler(async (req, res) => {
   const { id } = req.params as { id: string };
-  const [row] = await db.select().from(schema.profiles).where(eq(schema.profiles.id, id));
+  const [row] = await db.select(profileCols).from(schema.profiles).where(eq(schema.profiles.id, id));
   if (!row) return res.status(404).json({ error: 'not found' });
   res.json(row);
 }));

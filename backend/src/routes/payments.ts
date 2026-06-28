@@ -7,10 +7,19 @@ import { asyncHandler, badRequest } from '../middleware/error.js';
 const router = Router({ mergeParams: true });
 router.use(requireUser);
 
+const paymentCols = {
+  id: schema.payments.id,
+  event_id: schema.payments.eventId,
+  paid_on: schema.payments.paidOn,
+  amount: schema.payments.amount,
+  method: schema.payments.method,
+  note: schema.payments.note,
+};
+
 router.get('/', asyncHandler(async (req, res) => {
   const { eventId } = req.params as { eventId: string };
   const rows = await db
-    .select()
+    .select(paymentCols)
     .from(schema.payments)
     .where(eq(schema.payments.eventId, eventId))
     .orderBy(asc(schema.payments.paidOn));
@@ -32,7 +41,7 @@ router.post('/', asyncHandler(async (req, res) => {
       method,
       note: note ?? null,
     })
-    .returning();
+    .returning(paymentCols);
   res.status(201).json(row);
 }));
 
@@ -50,7 +59,7 @@ router.patch('/:id', asyncHandler(async (req, res) => {
     .update(schema.payments)
     .set(patch)
     .where(and(eq(schema.payments.id, id), eq(schema.payments.eventId, eventId)))
-    .returning();
+    .returning(paymentCols);
   if (!row) return res.status(404).json({ error: 'not found' });
   res.json(row);
 }));

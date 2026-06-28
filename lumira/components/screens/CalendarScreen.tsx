@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
@@ -8,15 +8,25 @@ import { SheetType } from './AppShell';
 import { Event } from '../../constants/data';
 import { FadeInUp, Pressable } from '../ui/anim';
 import Icon from '../ui/Icon';
+import { CalendarSkeleton } from '../ui/Skeleton';
 
 const WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
 export default function CalendarScreen({ openSheet }: Props) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, reloadEvents } = useApp();
   const insets = useSafeAreaInsets();
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await reloadEvents(state.teamId); } finally { setRefreshing(false); }
+  }, [reloadEvents, state.teamId]);
   const evs: Event[] = state.events[state.teamId] || [];
+  const eventsLoaded = !!state.events[state.teamId];
+  if (!eventsLoaded && state.loadingEvents) {
+    return <CalendarSkeleton />;
+  }
 
   const base = new Date(2026, 5, 1);
   base.setMonth(base.getMonth() + state.monthOffset);
@@ -59,6 +69,7 @@ export default function CalendarScreen({ openSheet }: Props) {
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 14, paddingBottom: 100 }]}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7C5CFC" />}
       >
         {/* Header */}
         <FadeInUp index={0} style={styles.header}>
@@ -198,7 +209,7 @@ const styles = StyleSheet.create({
   weekRow: { flexDirection: 'row' },
   weekDay: { flex: 1, textAlign: 'center', fontFamily: 'DMSans_600SemiBold', fontSize: 11, color: '#B3ABC8', paddingBottom: 6 },
   dayCell: { flex: 1, alignItems: 'center', paddingVertical: 2 },
-  dayCellBg: { width: 34, height: 34, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  dayCellBg: { width: 34, height: 34, borderRadius: 11, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   dayNum: { fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 14.5, color: COLORS.textPrimary },
   dotsRow: { flexDirection: 'row', gap: 2.5, marginTop: 3, height: 5 },
   dot: { width: 5, height: 5, borderRadius: 2.5 },

@@ -3,7 +3,12 @@ const MONTHS_LONG = ['January','February','March','April','May','June','July','A
 const WEEKDAYS_LONG = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const WEEKDAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-export const TODAY = '2026-06-26';
+export const TODAY = toISOStatic(new Date());
+
+function toISOStatic(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
 
 export function parseDate(iso: string): Date {
   const [y, m, d] = iso.split('-').map(Number);

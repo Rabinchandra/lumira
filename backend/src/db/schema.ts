@@ -64,6 +64,7 @@ export const events = pgTable(
   {
     id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
     teamId: uuid('team_id').notNull().references(() => teams.id, { onDelete: 'cascade' }),
+    createdByUserId: uuid('created_by_user_id').references(() => profiles.id, { onDelete: 'set null' }),
     type: text('type').notNull(),
     title: text('title').notNull(),
     eventDate: date('event_date').notNull(),

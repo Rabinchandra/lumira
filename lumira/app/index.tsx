@@ -1,3 +1,4 @@
+import { View } from 'react-native';
 import { useApp } from '../context/AppContext';
 import SignInScreen from '../components/screens/SignInScreen';
 import ProfileSetupScreen from '../components/screens/ProfileSetupScreen';
@@ -6,9 +7,18 @@ import CreateStudioScreen from '../components/screens/CreateStudioScreen';
 import JoinStudioScreen from '../components/screens/JoinStudioScreen';
 import AppShell from '../components/screens/AppShell';
 import { FadeInUp } from '../components/ui/anim';
+import { DashboardSkeleton } from '../components/ui/Skeleton';
 
 export default function Index() {
   const { state } = useApp();
+
+  if (state.booting) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#F6F5FB' }}>
+        <DashboardSkeleton />
+      </View>
+    );
+  }
 
   const screen = (() => {
     switch (state.screen) {

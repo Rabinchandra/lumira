@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
@@ -9,16 +9,40 @@ import {
 import { SheetType } from './AppShell';
 import { FadeInUp, Pressable, AnimatedBar } from '../ui/anim';
 import Icon from '../ui/Icon';
+import { EventDetailSkeleton } from '../ui/Skeleton';
+import { api } from '../../lib/api';
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
 export default function EventDetailScreen({ openSheet, showToast }: Props) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, refreshEvent, pickRoleId } = useApp();
   const insets = useSafeAreaInsets();
   const team = state.teams[state.teamId];
 
   const ev = (state.events[state.teamId] || []).find(e => e.id === state.openEventId);
-  if (!ev) return null;
+  if (!ev || !team) return <EventDetailSkeleton />;
+  const eventId = ev.id;
+
+  const removeAssignment = async (target: { memberId: string }) => {
+    const remaining = ev.assigned.filter(x => x.memberId !== target.memberId);
+    type AssignBody = { member_id?: string; external_name?: string; role_id: string };
+    const list: AssignBody[] = [];
+    for (const a of remaining) {
+      const role_id = pickRoleId(a.role);
+      if (!role_id) continue;
+      if (a.memberId.startsWith('ext-')) {
+        list.push({ external_name: a.name ?? 'External', role_id });
+      } else {
+        list.push({ member_id: a.memberId, role_id });
+      }
+    }
+    try {
+      await api.setAssignments(eventId, list);
+      await refreshEvent(eventId);
+    } catch (e: any) {
+      showToast(e?.message || 'Could not update crew');
+    }
+  };
 
   const T = EVENT_TYPES[ev.type];
   const paid = getPaidAmount(ev.payments);
@@ -30,6 +54,12 @@ export default function EventDetailScreen({ openSheet, showToast }: Props) {
   else if (pend === 0) { payStatus = 'Fully paid'; payColor = COLORS.green; payBg = '#E2FAF3'; }
   else { payStatus = 'Partially paid'; payColor = COLORS.amber; payBg = '#FFF3DE'; }
 
+  const creatorName = (() => {
+    if (!ev.createdByUserId) return null;
+    const m = team.members.find(x => x.userId === ev.createdByUserId);
+    return m ? (m.isMe ? 'You' : m.name) : null;
+  })();
+
   const crewName = (a: { memberId: string; name?: string }) => {
     const m = team.members.find(x => x.id === a.memberId);
     return m?.name || a.name || 'Crew';
@@ -37,6 +67,10 @@ export default function EventDetailScreen({ openSheet, showToast }: Props) {
   const crewColor = (a: { memberId: string; color?: string }) => {
     const m = team.members.find(x => x.id === a.memberId);
     return m?.color || a.color || '#9C95B4';
+  };
+  const crewPhoto = (a: { memberId: string }) => {
+    const m = team.members.find(x => x.id === a.memberId);
+    return m?.photoUrl ?? null;
   };
   const isExternal = (a: { memberId: string }) => !team.members.some(x => x.id === a.memberId);
 
@@ -54,12 +88,20 @@ export default function EventDetailScreen({ openSheet, showToast }: Props) {
             >
               <Icon name="chevron-left" size={24} color="#fff" strokeWidth={2.4} />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.heroBtn}
-              onPress={() => openSheet('delete')}
-            >
-              <Icon name="close" size={22} color="#fff" strokeWidth={2.4} />
-            </TouchableOpacity>
+            <View style={styles.heroBtnGroup}>
+              <TouchableOpacity
+                style={styles.heroBtn}
+                onPress={() => openSheet('editEvent')}
+              >
+                <Icon name="edit" size={20} color="#fff" strokeWidth={2.2} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.heroBtn}
+                onPress={() => openSheet('delete')}
+              >
+                <Icon name="close" size={22} color="#fff" strokeWidth={2.4} />
+              </TouchableOpacity>
+            </View>
           </View>
           {/* Title at bottom */}
           <FadeInUp delay={120} style={styles.heroBottom}>
@@ -81,30 +123,48 @@ export default function EventDetailScreen({ openSheet, showToast }: Props) {
               <View style={styles.metaIcon}><Icon name="clock" size={19} color={COLORS.textSecondary} /></View>
               <Text style={styles.metaText}>{ev.timeLabel}</Text>
             </View>
-            <View style={[styles.metaRow, styles.metaLast]}>
+            <View style={[styles.metaRow, styles.metaBorder]}>
               <View style={styles.metaIcon}><Icon name="pin" size={19} color={COLORS.textSecondary} /></View>
-              <Text style={styles.metaText}>{ev.venue}</Text>
+              <Text style={[styles.metaText, !ev.venue && styles.metaMuted]}>
+                {ev.venue || 'Venue not set'}
+              </Text>
             </View>
+            {creatorName && (
+              <View style={[styles.metaRow, styles.metaLast]}>
+                <View style={styles.metaIcon}><Icon name="user" size={19} color={COLORS.textSecondary} /></View>
+                <Text style={styles.metaText}>Created by <Text style={styles.metaStrong}>{creatorName}</Text></Text>
+              </View>
+            )}
           </FadeInUp>
 
           {/* Client */}
           <FadeInUp index={2} style={styles.clientCard}>
             <View style={[styles.clientAvatar, { backgroundColor: T?.soft }]}>
               <Text style={[styles.clientAvatarText, { color: T?.color }]}>
-                {initials(ev.clientName)}
+                {ev.clientName ? initials(ev.clientName) : '?'}
               </Text>
             </View>
             <View style={styles.clientInfo}>
-              <Text style={styles.clientName}>{ev.clientName}</Text>
-              <Text style={styles.clientPhone}>{ev.clientPhone}</Text>
+              <Text style={[styles.clientName, !ev.clientName && styles.metaMuted]}>
+                {ev.clientName || 'Client not set'}
+              </Text>
+              <Text style={styles.clientPhone}>
+                {ev.clientPhone || 'No phone number'}
+              </Text>
             </View>
-            <Pressable
-              onPress={() => openSheet('call', { name: ev.clientName, phone: ev.clientPhone })}
-              scaleTo={0.9}
-              style={styles.callBtn}
-            >
-              <Icon name="phone" size={20} color="#fff" />
-            </Pressable>
+            {ev.clientPhone ? (
+              <Pressable
+                onPress={() => openSheet('call', { name: ev.clientName, phone: ev.clientPhone })}
+                scaleTo={0.9}
+                style={styles.callBtn}
+              >
+                <Icon name="phone" size={20} color="#fff" />
+              </Pressable>
+            ) : (
+              <Pressable onPress={() => openSheet('editEvent')} scaleTo={0.9} style={styles.editClientBtn}>
+                <Icon name="edit" size={18} color={COLORS.textSecondary} />
+              </Pressable>
+            )}
           </FadeInUp>
 
           {/* Payments */}
@@ -170,10 +230,13 @@ export default function EventDetailScreen({ openSheet, showToast }: Props) {
               ev.assigned.map((a, i) => {
                 const name = crewName(a);
                 const color = crewColor(a);
+                const photo = crewPhoto(a);
                 return (
                   <View key={i} style={[styles.crewRow, i > 0 && { marginTop: 13 }]}>
-                    <View style={[styles.crewAvatar, { backgroundColor: color }]}>
-                      <Text style={styles.crewAvatarText}>{initials(name)}</Text>
+                    <View style={[styles.crewAvatar, { backgroundColor: color, overflow: 'hidden' }]}>
+                      {photo
+                        ? <Image source={{ uri: photo }} style={styles.crewAvatarImg} />
+                        : <Text style={styles.crewAvatarText}>{initials(name)}</Text>}
                     </View>
                     <View style={{ flex: 1 }}>
                       <View style={styles.crewNameRow}>
@@ -186,11 +249,7 @@ export default function EventDetailScreen({ openSheet, showToast }: Props) {
                     </View>
                     <Pressable
                       onPress={() => {
-                        dispatch({
-                          type: 'UPDATE_EVENT_CREW',
-                          eventId: ev.id,
-                          assigned: ev.assigned.filter(x => x.memberId !== a.memberId),
-                        });
+                        removeAssignment(a);
                         showToast(`Removed ${name}`);
                       }}
                       scaleTo={0.85}
@@ -235,6 +294,7 @@ const styles = StyleSheet.create({
     width: 40, height: 40, borderRadius: 13,
     backgroundColor: 'rgba(255,255,255,0.22)', alignItems: 'center', justifyContent: 'center',
   },
+  heroBtnGroup: { flexDirection: 'row', gap: 8 },
   heroBtnText: { fontSize: 20, color: '#fff', lineHeight: 24 },
   heroBottom: { position: 'absolute', left: 18, right: 18, bottom: 16 },
   typeTag: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: 7, alignSelf: 'flex-start', marginBottom: 9 },
@@ -249,6 +309,8 @@ const styles = StyleSheet.create({
   metaLast: { borderTopWidth: 1, borderTopColor: '#F2F0F8' },
   metaIcon: { fontSize: 18, width: 22 },
   metaText: { fontFamily: 'DMSans_500Medium', fontSize: 14.5, color: COLORS.textPrimary, flex: 1 },
+  metaMuted: { color: COLORS.textMuted, fontStyle: 'italic' },
+  metaStrong: { fontFamily: 'DMSans_700Bold', color: COLORS.textPrimary },
 
   clientCard: {
     backgroundColor: '#fff', borderWidth: 1, borderColor: '#F0EEF7',
@@ -263,6 +325,10 @@ const styles = StyleSheet.create({
     width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
     backgroundColor: ACCENT.solid,
     shadowColor: '#7C5CFC', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
+  },
+  editClientBtn: {
+    width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#F6F5FB', borderWidth: 1.5, borderColor: '#E6E3F0',
   },
   callIcon: { fontSize: 20, color: '#fff' },
 
@@ -293,6 +359,7 @@ const styles = StyleSheet.create({
 
   crewRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   crewAvatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  crewAvatarImg: { width: 40, height: 40, borderRadius: 20 },
   crewAvatarText: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 14, color: '#fff' },
   crewNameRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   crewName: { fontFamily: 'SpaceGrotesk_600SemiBold', fontSize: 14.5, color: COLORS.textPrimary },

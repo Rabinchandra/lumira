@@ -20,7 +20,9 @@ export type IconName =
   | 'wallet'
   | 'alert'
   | 'eye'
-  | 'eye-off';
+  | 'eye-off'
+  | 'user'
+  | 'edit';
 
 type Props = {
   name: IconName;
@@ -182,6 +184,20 @@ function paths(name: IconName, c: any, color: string) {
           <Path d="M6.3 7.8A15.7 15.7 0 0 0 2.5 12S6 18.5 12 18.5a8.6 8.6 0 0 0 3.9-.9" {...c} />
           <Path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" {...c} />
           <Line x1="4" y1="4" x2="20" y2="20" {...c} />
+        </>
+      );
+    case 'user':
+      return (
+        <>
+          <Circle cx="12" cy="8" r="3.5" {...c} />
+          <Path d="M4.5 20.5a8 8 0 0 1 15 0" {...c} />
+        </>
+      );
+    case 'edit':
+      return (
+        <>
+          <Path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" {...c} />
+          <Path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5Z" {...c} />
         </>
       );
     default:

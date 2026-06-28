@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Pressable, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
@@ -7,18 +7,29 @@ import { formatMed, initials, parseDate, toISO, monthLabel } from '../../constan
 import { Event } from '../../constants/data';
 import { Pressable as AnimPressable } from './anim';
 import Icon from './Icon';
+import { api } from '../../lib/api';
 
 const WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 type Props = { onClose: () => void; showToast: (m: string) => void };
 
 export default function NewEventSheet({ onClose, showToast }: Props) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, refreshEvent, pickRoleId } = useApp();
   const insets = useSafeAreaInsets();
   const members = state.teams[state.teamId]?.members || [];
   const [crew, setCrew] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
   const [localDate, setLocalDate] = useState(state.selectedDate);
   const [showCal, setShowCal] = useState(false);
+  const [startTime, setStartTime] = useState('10:00');
+  const [startMeridiem, setStartMeridiem] = useState<'AM' | 'PM'>('AM');
+  const [endTime, setEndTime] = useState('2:00');
+  const [endMeridiem, setEndMeridiem] = useState<'AM' | 'PM'>('PM');
+  const [titleError, setTitleError] = useState(false);
+  const [venue, setVenue] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [notes, setNotes] = useState('');
   const initD = parseDate(state.selectedDate);
   const [viewY, setViewY] = useState(initD.getFullYear());
   const [viewM, setViewM] = useState(initD.getMonth());
@@ -45,31 +56,50 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
     weeks.push(days);
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (submitting) return;
     const t = state.newTitle.trim();
-    if (!t) { showToast('Add a title'); return; }
+    if (!t) { setTitleError(true); return; }
     const total = parseInt(state.newTotal, 10) || 0;
-    const assigned = crew.map(id => ({
-      memberId: id,
-      role: members.find(m => m.id === id)?.role || 'Crew',
-    }));
-    const newEv: Event = {
-      id: 'n' + Date.now(),
-      type: state.newType,
-      title: t,
-      dateISO: localDate,
-      timeLabel: '10:00 AM – 2:00 PM',
-      venue: 'To be confirmed',
-      clientName: 'New client',
-      clientPhone: '+91 90000 00000',
-      assigned,
-      total,
-      notes: 'Added from quick create. Edit to add full details.',
-      payments: [],
-    };
-    dispatch({ type: 'ADD_EVENT', teamId: state.teamId, event: newEv });
-    showToast('Event created');
-    onClose();
+    const timeLabel = `${startTime.trim()} ${startMeridiem} – ${endTime.trim()} ${endMeridiem}`;
+    setSubmitting(true);
+    try {
+      const created = await api.createEvent({
+        team_id: state.teamId,
+        type: state.newType,
+        title: t,
+        event_date: localDate,
+        time_label: timeLabel,
+        venue: venue.trim() || undefined,
+        client_name: clientName.trim() || undefined,
+        client_phone: clientPhone.trim() || undefined,
+        total,
+        notes: notes.trim() || undefined,
+      });
+      // Assign selected crew (if any) by replacing assignments.
+      if (crew.length) {
+        const list = crew
+          .map(id => {
+            const m = members.find(x => x.id === id);
+            const roleId = pickRoleId(m?.role);
+            return roleId ? { member_id: id, role_id: roleId } : null;
+          })
+          .filter((x): x is { member_id: string; role_id: string } => x !== null);
+        if (list.length) {
+          await api.setAssignments(created.id, list);
+        }
+      }
+      await refreshEvent(created.id);
+      dispatch({ type: 'SET_NEW_TITLE', title: '' });
+      dispatch({ type: 'SET_NEW_TOTAL', total: '' });
+      dispatch({ type: 'SET_TAB', tab: 'calendar' });
+      showToast('Event created');
+      onClose();
+    } catch (e: any) {
+      showToast(e?.message || 'Could not create event');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -82,12 +112,16 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
 
             <Text style={styles.label}>Title</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, titleError && styles.inputError]}
               placeholder="e.g. Sharma Wedding"
               placeholderTextColor={COLORS.textMuted}
               value={state.newTitle}
-              onChangeText={v => dispatch({ type: 'SET_NEW_TITLE', title: v })}
+              onChangeText={v => {
+                if (titleError && v.trim()) setTitleError(false);
+                dispatch({ type: 'SET_NEW_TITLE', title: v });
+              }}
             />
+            {titleError && <Text style={styles.errorText}>Please add a title</Text>}
 
             <Text style={styles.label}>Type</Text>
             <View style={styles.chips}>
@@ -126,6 +160,47 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
                   onChangeText={v => dispatch({ type: 'SET_NEW_TOTAL', total: v.replace(/[^0-9]/g, '') })}
                   keyboardType="numeric"
                 />
+              </View>
+            </View>
+
+            <View style={styles.row}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>Start time</Text>
+                <View style={styles.timeRow}>
+                  <TextInput
+                    style={[styles.input, styles.timeInput]}
+                    placeholder="10:00"
+                    placeholderTextColor={COLORS.textMuted}
+                    value={startTime}
+                    onChangeText={setStartTime}
+                    keyboardType="numbers-and-punctuation"
+                  />
+                  <TouchableOpacity
+                    style={styles.meridiemBtn}
+                    onPress={() => setStartMeridiem(m => (m === 'AM' ? 'PM' : 'AM'))}
+                  >
+                    <Text style={styles.meridiemText}>{startMeridiem}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>End time</Text>
+                <View style={styles.timeRow}>
+                  <TextInput
+                    style={[styles.input, styles.timeInput]}
+                    placeholder="2:00"
+                    placeholderTextColor={COLORS.textMuted}
+                    value={endTime}
+                    onChangeText={setEndTime}
+                    keyboardType="numbers-and-punctuation"
+                  />
+                  <TouchableOpacity
+                    style={styles.meridiemBtn}
+                    onPress={() => setEndMeridiem(m => (m === 'AM' ? 'PM' : 'AM'))}
+                  >
+                    <Text style={styles.meridiemText}>{endMeridiem}</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
 
@@ -170,6 +245,50 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
               </View>
             )}
 
+            <Text style={styles.label}>Venue <Text style={styles.optional}>Optional</Text></Text>
+            <TextInput
+              style={styles.input}
+              placeholder="e.g. Hotel Grand Palace, Mumbai"
+              placeholderTextColor={COLORS.textMuted}
+              value={venue}
+              onChangeText={setVenue}
+            />
+
+            <View style={styles.row}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>Client name <Text style={styles.optional}>Optional</Text></Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. Rohan Sharma"
+                  placeholderTextColor={COLORS.textMuted}
+                  value={clientName}
+                  onChangeText={setClientName}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>Client phone <Text style={styles.optional}>Optional</Text></Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="+91 98765 43210"
+                  placeholderTextColor={COLORS.textMuted}
+                  value={clientPhone}
+                  onChangeText={setClientPhone}
+                  keyboardType="phone-pad"
+                />
+              </View>
+            </View>
+
+            <Text style={styles.label}>Notes <Text style={styles.optional}>Optional</Text></Text>
+            <TextInput
+              style={[styles.input, styles.notesInput]}
+              placeholder="Any details about the event…"
+              placeholderTextColor={COLORS.textMuted}
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+              textAlignVertical="top"
+            />
+
             <View style={styles.crewHead}>
               <Text style={[styles.label, { marginBottom: 0 }]}>Crew</Text>
               <Text style={styles.optional}>
@@ -201,8 +320,10 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
               })}
             </View>
 
-            <AnimPressable onPress={handleSubmit} style={[styles.createBtn, { marginTop: 20 }]}>
-              <Text style={styles.createBtnText}>Create event</Text>
+            <AnimPressable onPress={handleSubmit} disabled={submitting} style={[styles.createBtn, { marginTop: 20 }]}>
+              {submitting
+                ? <ActivityIndicator color="#fff" />
+                : <Text style={styles.createBtnText}>Create event</Text>}
             </AnimPressable>
           </ScrollView>
         </Pressable>
@@ -235,6 +356,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
   },
   dateText: { fontFamily: 'DMSans_500Medium', fontSize: 14, color: COLORS.textPrimary },
+  timeRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16 },
+  timeInput: { flex: 1, marginBottom: 0, paddingHorizontal: 12 },
+  meridiemBtn: {
+    height: 50, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1.5,
+    borderColor: '#E6E3F0', backgroundColor: '#F6F5FB',
+    alignItems: 'center', justifyContent: 'center', minWidth: 54,
+  },
+  meridiemText: { fontFamily: 'DMSans_700Bold', fontSize: 13, color: COLORS.textPrimary },
+  notesInput: { height: 90, paddingTop: 13 },
+  inputError: { borderColor: COLORS.red },
+  errorText: { fontFamily: 'DMSans_500Medium', fontSize: 12, color: COLORS.red, marginTop: -10, marginBottom: 14 },
 
   calCard: {
     borderRadius: 16, borderWidth: 1.5, borderColor: '#E6E3F0',

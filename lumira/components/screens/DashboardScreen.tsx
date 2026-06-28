@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
@@ -11,14 +11,27 @@ import { SheetType } from './AppShell';
 import { Event } from '../../constants/data';
 import { FadeInUp, Pressable, AnimatedBar } from '../ui/anim';
 import Icon from '../ui/Icon';
+import { DashboardSkeleton } from '../ui/Skeleton';
 
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
 export default function DashboardScreen({ openSheet, showToast }: Props) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, reloadEvents } = useApp();
   const insets = useSafeAreaInsets();
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await reloadEvents(state.teamId); } finally { setRefreshing(false); }
+  }, [reloadEvents, state.teamId]);
   const team = state.teams[state.teamId];
   const evs: Event[] = state.events[state.teamId] || [];
+  const profile = state.profile;
+  const profileName = profile?.displayName || profile?.email || 'You';
+  const userInitials = (initials(profileName) || profileName.slice(0, 2)).toUpperCase();
+  const eventsLoaded = !!state.events[state.teamId];
+  if (!team || state.loadingTeams || (!eventsLoaded && state.loadingEvents)) {
+    return <DashboardSkeleton />;
+  }
 
   const base = new Date(2026, 5, 1);
   base.setMonth(base.getMonth() + state.monthOffset);
@@ -65,6 +78,7 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 6, paddingBottom: 100 }]}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7C5CFC" />}
       >
         {/* Header */}
         <FadeInUp index={0} style={styles.header}>
@@ -83,9 +97,13 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
           <TouchableOpacity
             onPress={() => dispatch({ type: 'SET_TAB', tab: 'studio' })}
           >
-            <View style={[styles.userAvatar, { backgroundColor: ACCENT.solid }]}>
-              <Text style={styles.userAvatarText}>AM</Text>
-            </View>
+            {profile?.photoUrl ? (
+              <Image source={{ uri: profile.photoUrl }} style={styles.userAvatar} />
+            ) : (
+              <View style={[styles.userAvatar, { backgroundColor: ACCENT.solid, alignItems: 'center', justifyContent: 'center' }]}>
+                <Text style={styles.userAvatarText}>{userInitials}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         </FadeInUp>
 

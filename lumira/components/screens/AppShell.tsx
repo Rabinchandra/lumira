@@ -13,11 +13,12 @@ import PaymentSheet from '../ui/PaymentSheet';
 import NewEventSheet from '../ui/NewEventSheet';
 import CrewSheet from '../ui/CrewSheet';
 import DeleteSheet from '../ui/DeleteSheet';
+import EditEventSheet from '../ui/EditEventSheet';
 import CallingOverlay from '../ui/CallingOverlay';
 import Toast from '../ui/Toast';
 import { FadeInUp } from '../ui/anim';
 
-export type SheetType = 'team' | 'pay' | 'new' | 'crew' | 'delete' | 'call' | null;
+export type SheetType = 'team' | 'pay' | 'new' | 'crew' | 'delete' | 'call' | 'editEvent' | null;
 
 export default function AppShell() {
   const { state } = useApp();
@@ -70,7 +71,8 @@ export default function AppShell() {
       {sheet === 'pay'    && <PaymentSheet onClose={closeSheet} showToast={showToast} />}
       {sheet === 'new'    && <NewEventSheet onClose={closeSheet} showToast={showToast} />}
       {sheet === 'crew'   && <CrewSheet onClose={closeSheet} showToast={showToast} />}
-      {sheet === 'delete' && <DeleteSheet onClose={closeSheet} showToast={showToast} />}
+      {sheet === 'delete'    && <DeleteSheet onClose={closeSheet} showToast={showToast} />}
+      {sheet === 'editEvent' && <EditEventSheet onClose={closeSheet} showToast={showToast} />}
       {sheet === 'call'   && callInfo && (
         <CallingOverlay name={callInfo.name} phone={callInfo.phone} onEnd={closeSheet} />
       )}

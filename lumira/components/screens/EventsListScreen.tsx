@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS, EVENT_TYPES } from '../../constants/colors';
@@ -7,6 +7,7 @@ import { parseDate, getPaidAmount, formatINRShort, TODAY, MONTHS_SHORT } from '.
 import { SheetType } from './AppShell';
 import { Event } from '../../constants/data';
 import { FadeInUp, Pressable } from '../ui/anim';
+import { EventsListSkeleton } from '../ui/Skeleton';
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -17,9 +18,18 @@ const FILTERS = [
 type Props = { openSheet: (s: SheetType, extra?: any) => void; showToast: (m: string) => void };
 
 export default function EventsListScreen({ }: Props) {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, reloadEvents } = useApp();
   const insets = useSafeAreaInsets();
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await reloadEvents(state.teamId); } finally { setRefreshing(false); }
+  }, [reloadEvents, state.teamId]);
   const evs: Event[] = state.events[state.teamId] || [];
+  const eventsLoaded = !!state.events[state.teamId];
+  if (!eventsLoaded && state.loadingEvents) {
+    return <EventsListSkeleton />;
+  }
   const todayD = parseDate(TODAY);
 
   let list = [...evs];
@@ -32,6 +42,7 @@ export default function EventsListScreen({ }: Props) {
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 14, paddingBottom: 100 }]}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7C5CFC" />}
       >
         <FadeInUp index={0}>
           <Text style={styles.heading}>Events</Text>

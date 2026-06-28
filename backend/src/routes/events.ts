@@ -7,6 +7,38 @@ import { asyncHandler, badRequest } from '../middleware/error.js';
 const router = Router();
 router.use(requireUser);
 
+const eventCols = {
+  id: schema.events.id,
+  team_id: schema.events.teamId,
+  created_by_user_id: schema.events.createdByUserId,
+  type: schema.events.type,
+  title: schema.events.title,
+  event_date: schema.events.eventDate,
+  time_label: schema.events.timeLabel,
+  venue: schema.events.venue,
+  client_name: schema.events.clientName,
+  client_phone: schema.events.clientPhone,
+  total: schema.events.total,
+  notes: schema.events.notes,
+};
+
+const assignmentCols = {
+  id: schema.assignments.id,
+  event_id: schema.assignments.eventId,
+  member_id: schema.assignments.memberId,
+  role_id: schema.assignments.roleId,
+  external_name: schema.assignments.externalName,
+};
+
+const paymentCols = {
+  id: schema.payments.id,
+  event_id: schema.payments.eventId,
+  paid_on: schema.payments.paidOn,
+  amount: schema.payments.amount,
+  method: schema.payments.method,
+  note: schema.payments.note,
+};
+
 router.get('/', asyncHandler(async (req, res) => {
   const { team_id, from, to, type } = req.query as unknown as Record<string, string | undefined>;
   const filters: SQL[] = [];
@@ -16,7 +48,7 @@ router.get('/', asyncHandler(async (req, res) => {
   if (type) filters.push(eq(schema.events.type, type));
 
   const rows = await db
-    .select()
+    .select(eventCols)
     .from(schema.events)
     .where(filters.length ? and(...filters) : undefined)
     .orderBy(desc(schema.events.eventDate));
@@ -25,13 +57,13 @@ router.get('/', asyncHandler(async (req, res) => {
 
 router.get('/:id', asyncHandler(async (req, res) => {
   const { id } = req.params as { id: string };
-  const [event] = await db.select().from(schema.events).where(eq(schema.events.id, id));
+  const [event] = await db.select(eventCols).from(schema.events).where(eq(schema.events.id, id));
   if (!event) return res.status(404).json({ error: 'not found' });
 
   const [assignments, payments] = await Promise.all([
-    db.select().from(schema.assignments).where(eq(schema.assignments.eventId, id)),
+    db.select(assignmentCols).from(schema.assignments).where(eq(schema.assignments.eventId, id)),
     db
-      .select()
+      .select(paymentCols)
       .from(schema.payments)
       .where(eq(schema.payments.eventId, id))
       .orderBy(asc(schema.payments.paidOn)),
@@ -52,6 +84,7 @@ router.post('/', asyncHandler(async (req, res) => {
     .insert(schema.events)
     .values({
       teamId: team_id,
+      createdByUserId: req.user!.id,
       type,
       title,
       eventDate: event_date,
@@ -62,7 +95,7 @@ router.post('/', asyncHandler(async (req, res) => {
       total: String(total),
       notes: notes ?? null,
     })
-    .returning();
+    .returning(eventCols);
   res.status(201).json(row);
 }));
 
@@ -90,7 +123,7 @@ router.patch('/:id', asyncHandler(async (req, res) => {
     .update(schema.events)
     .set(patch)
     .where(eq(schema.events.id, id))
-    .returning();
+    .returning(eventCols);
   if (!row) return res.status(404).json({ error: 'not found' });
   res.json(row);
 }));

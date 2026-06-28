@@ -1,17 +1,19 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../context/AppContext';
 import { ACCENT, COLORS } from '../../constants/colors';
 import { FadeInUp, PopIn, Pressable } from '../ui/anim';
 import Icon from '../ui/Icon';
+import { api } from '../../lib/api';
 
 export default function JoinStudioScreen() {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, reloadTeams, pickRoleId } = useApp();
   const insets = useSafeAreaInsets();
+  const [submitting, setSubmitting] = useState(false);
   const code = (state.joinCode || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
-  const joinOk = code.length > 0;
+  const joinOk = code.length === 6 && !submitting;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
@@ -60,7 +62,7 @@ export default function JoinStudioScreen() {
         />
 
         <Text style={styles.hint}>
-          Try <Text style={{ color: COLORS.textSecondary, fontFamily: 'SpaceGrotesk_600SemiBold' }}>LUM4X9</Text> to preview a joined studio
+          Ask the studio owner for their 6-character invite code.
         </Text>
         </FadeInUp>
       </View>
@@ -68,17 +70,30 @@ export default function JoinStudioScreen() {
       <View style={styles.bottom}>
         <Pressable
           disabled={!joinOk}
-          onPress={() => {
+          onPress={async () => {
             if (!joinOk) return;
-            dispatch({ type: 'SET_SCREEN', screen: 'app' });
-            dispatch({ type: 'SET_TEAM', teamId: 'A' });
+            const roleId = pickRoleId();
+            if (!roleId) { Alert.alert('Roles not loaded', 'Try again in a moment.'); return; }
+            setSubmitting(true);
+            try {
+              const team = await api.joinTeam({ invite_code: code, role_id: roleId });
+              const teams = await reloadTeams();
+              if (teams[team.id]) dispatch({ type: 'SET_TEAM', teamId: team.id });
+              dispatch({ type: 'SET_SCREEN', screen: 'app' });
+            } catch (e: any) {
+              Alert.alert('Could not join', e?.message ?? 'Please try again.');
+            } finally {
+              setSubmitting(false);
+            }
           }}
         >
           <LinearGradient
             colors={joinOk ? ACCENT.grad : ['#E6E3F0', '#E6E3F0']}
             style={styles.joinBtn}
           >
-            <Text style={[styles.joinBtnText, !joinOk && { color: '#B3ABC8' }]}>Join studio</Text>
+            {submitting
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={[styles.joinBtnText, !joinOk && { color: '#B3ABC8' }]}>Join studio</Text>}
           </LinearGradient>
         </Pressable>
       </View>

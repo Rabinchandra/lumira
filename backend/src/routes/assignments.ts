@@ -7,9 +7,17 @@ import { asyncHandler, badRequest } from '../middleware/error.js';
 const router = Router({ mergeParams: true });
 router.use(requireUser);
 
+const assignmentCols = {
+  id: schema.assignments.id,
+  event_id: schema.assignments.eventId,
+  member_id: schema.assignments.memberId,
+  role_id: schema.assignments.roleId,
+  external_name: schema.assignments.externalName,
+};
+
 router.get('/', asyncHandler(async (req, res) => {
   const { eventId } = req.params as { eventId: string };
-  const rows = await db.select().from(schema.assignments).where(eq(schema.assignments.eventId, eventId));
+  const rows = await db.select(assignmentCols).from(schema.assignments).where(eq(schema.assignments.eventId, eventId));
   res.json(rows);
 }));
 
@@ -27,7 +35,7 @@ router.post('/', asyncHandler(async (req, res) => {
       roleId: role_id,
       externalName: external_name ?? null,
     })
-    .returning();
+    .returning(assignmentCols);
   res.status(201).json(row);
 }));
 
@@ -53,7 +61,7 @@ router.put('/', asyncHandler(async (req, res) => {
     }
   });
 
-  const rows = await db.select().from(schema.assignments).where(eq(schema.assignments.eventId, eventId));
+  const rows = await db.select(assignmentCols).from(schema.assignments).where(eq(schema.assignments.eventId, eventId));
   res.json(rows);
 }));
 
