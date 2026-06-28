@@ -9,7 +9,7 @@ import {
 } from '../../constants/helpers';
 import { SheetType } from './AppShell';
 import { Event } from '../../constants/data';
-import { FadeInUp, Pressable, AnimatedBar } from '../ui/anim';
+import { FadeInUp, Pressable, AnimatedBar, PulseBlob } from '../ui/anim';
 import Icon from '../ui/Icon';
 import { DashboardSkeleton } from '../ui/Skeleton';
 
@@ -130,7 +130,7 @@ export default function DashboardScreen({ openSheet, showToast }: Props) {
         {/* Hero revenue card */}
         <FadeInUp index={2}>
           <View style={styles.heroCard}>
-            <View style={styles.heroBlob} />
+            <PulseBlob style={styles.heroBlob} duration={14000} radius={12} />
             <Text style={styles.heroSub}>Collected this month</Text>
             <View style={styles.heroAmtRow}>
               <Text style={styles.heroAmt}>{formatINR(collected)}</Text>

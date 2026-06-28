@@ -193,6 +193,52 @@ export function AnimatedBar({ pct, delay = 200, duration = 900, style, children 
 }
 
 /* ------------------------------------------------------------------ *
+ * PulseBlob — decorative circle that slowly orbits in a tiny loop.
+ * No pulse / scale change — just a calm continuous drift.
+ * ------------------------------------------------------------------ */
+type PulseBlobProps = {
+  style?: StyleProp<ViewStyle>;
+  duration?: number;
+  radius?: number;
+};
+
+export function PulseBlob({
+  style,
+  duration = 12000,
+  radius = 10,
+}: PulseBlobProps) {
+  const v = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.timing(v, {
+        toValue: 1,
+        duration,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    );
+    loop.start();
+    return () => loop.stop();
+  }, []);
+
+  // Sample a smooth circular path with 9 points (0 and 1 match to close the loop).
+  const steps = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
+  const xPath = steps.map(t => Math.sin(t * Math.PI * 2) * radius);
+  const yPath = steps.map(t => Math.cos(t * Math.PI * 2) * radius);
+
+  const translateX = v.interpolate({ inputRange: steps, outputRange: xPath });
+  const translateY = v.interpolate({ inputRange: steps, outputRange: yPath });
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[style, { transform: [{ translateX }, { translateY }] }]}
+    />
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * useFloat — gentle infinite up/down float for decorative blobs.
  * Returns a transform-ready translateY Animated value.
  * ------------------------------------------------------------------ */

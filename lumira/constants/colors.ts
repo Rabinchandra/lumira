@@ -23,29 +23,65 @@ export const COLORS = {
 };
 
 export const EVENT_TYPES: Record<string, { label: string; color: string; soft: string; grad: [string, string] }> = {
+  Luhongba: {
+    label: 'Luhongba',
+    color: '#E04040',
+    soft: '#FDEAEA',
+    grad: ['#F06060', '#C82020'],
+  },
+  Heijingpot: {
+    label: 'Heijingpot',
+    color: '#D97706',
+    soft: '#FEF3E2',
+    grad: ['#F59E0B', '#B45309'],
+  },
+  Chakouba: {
+    label: 'Chakouba',
+    color: '#7C3AED',
+    soft: '#EDE9FE',
+    grad: ['#A78BFA', '#6D28D9'],
+  },
+  PostWedding: {
+    label: 'Post Wedding',
+    color: '#DB2777',
+    soft: '#FCE7F3',
+    grad: ['#F472B6', '#BE185D'],
+  },
+  PreWedding: {
+    label: 'Pre Wedding',
+    color: '#7C5CFC',
+    soft: '#EFEBFF',
+    grad: ['#9B7CFF', '#6A3DF5'],
+  },
   Wedding: {
     label: 'Wedding',
     color: '#FF4D8D',
     soft: '#FFEAF1',
     grad: ['#FF6FA3', '#FF2D7E'],
   },
-  PreWedding: {
-    label: 'Pre-Wedding',
-    color: '#7C5CFC',
-    soft: '#EFEBFF',
-    grad: ['#9B7CFF', '#6A3DF5'],
+  Paternity: {
+    label: 'Paternity',
+    color: '#0891B2',
+    soft: '#E0F7FA',
+    grad: ['#22D3EE', '#0E7490'],
   },
-  Corporate: {
-    label: 'Corporate',
-    color: '#2E8BFF',
-    soft: '#E6F1FF',
-    grad: ['#5BA8FF', '#1E6FE0'],
+  Chagumba: {
+    label: 'Chagumba',
+    color: '#059669',
+    soft: '#D1FAE5',
+    grad: ['#34D399', '#047857'],
   },
   Portrait: {
     label: 'Portrait',
     color: '#F59E0B',
     soft: '#FFF3DE',
     grad: ['#FFC44D', '#F38B00'],
+  },
+  Family: {
+    label: 'Family',
+    color: '#2563EB',
+    soft: '#DBEAFE',
+    grad: ['#60A5FA', '#1D4ED8'],
   },
   Event: {
     label: 'Event',
