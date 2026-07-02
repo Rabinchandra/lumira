@@ -112,3 +112,10 @@ export const payments = pgTable(
   },
   (t) => [index('payments_event_idx').on(t.eventId)],
 );
+
+export const healthCheck = pgTable('health_check', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  status: text('status').notNull().default('healthy'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
