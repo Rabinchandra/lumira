@@ -43,10 +43,11 @@ export default function EditEventSheet({ onClose, showToast }: Props) {
 
   return (
     <Modal transparent animationType="slide" visible>
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]}>
+      <View style={styles.backdrop}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <View style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]}>
           <View style={styles.handle} />
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             <Text style={styles.title}>Edit details</Text>
 
             <Text style={styles.label}>Venue</Text>
@@ -94,8 +95,8 @@ export default function EditEventSheet({ onClose, showToast }: Props) {
                 : <Text style={styles.saveBtnText}>Save changes</Text>}
             </AnimPressable>
           </ScrollView>
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }

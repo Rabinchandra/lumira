@@ -108,10 +108,11 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
 
   return (
     <Modal transparent animationType="slide" visible>
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={[styles.sheet, { paddingBottom: insets.bottom + 16, maxHeight: '88%' }]}>
+      <View style={styles.backdrop}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <View style={[styles.sheet, { paddingBottom: insets.bottom + 16, maxHeight: '88%' }]}>
           <View style={styles.handle} />
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             <Text style={styles.title}>New event</Text>
 
             <Text style={styles.label}>Title</Text>
@@ -366,8 +367,8 @@ export default function NewEventSheet({ onClose, showToast }: Props) {
                 : <Text style={styles.createBtnText}>Create event</Text>}
             </AnimPressable>
           </ScrollView>
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }

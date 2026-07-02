@@ -107,10 +107,11 @@ export default function CrewSheet({ onClose, showToast }: Props) {
 
   return (
     <Modal transparent animationType="slide" visible>
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={[styles.sheet, { paddingBottom: insets.bottom + 16, maxHeight: '88%' }]}>
+      <View style={styles.backdrop}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <View style={[styles.sheet, { paddingBottom: insets.bottom + 16, maxHeight: '88%' }]}>
           <View style={styles.handle} />
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             <Text style={styles.title}>Edit crew</Text>
             <Text style={styles.sub}>Tap to add or remove. Set a role for anyone you include.</Text>
 
@@ -229,8 +230,8 @@ export default function CrewSheet({ onClose, showToast }: Props) {
               {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Save crew</Text>}
             </AnimPressable>
           </ScrollView>
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }
